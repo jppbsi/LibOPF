@@ -256,6 +256,7 @@ void opf_OPFknnTraining(Subgraph *sg, int kmax){
   opf_CreateArcs(sg, sg->bestk);
   opf_PDF(sg);
   opf_OPFClustering4SupervisedLearning(sg);
+  opf_DestroyArcs(sg);
 }
 
 int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
