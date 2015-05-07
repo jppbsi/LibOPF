@@ -274,6 +274,112 @@ void opf_OPFAgglomerativeLearning(Subgraph **sgtrain, Subgraph **sgeval){
     }while(n);
 }
 
+void opf_OPFknnTraining(Subgraph *sg, int kmax){
+  int bestk;
+  Subgraph *cpy = NULL;
+  
+  bestk = opf_OPFknnLearning(sg, sg, kmax);
+}
+
+int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
+  int k, bestk = 1;
+  double MaxAcc = DBL_MIN, Acc = 0.0;
+  Subgraph *Train_cpy = CopySubgraph(Train), *Eval_cpy = CopySubgraph(Eval);
+  
+  for(k = 1; k <= kmax; k++){
+    Train_cpy->bestk = k;
+    
+    opf_CreateArcs(Train_cpy, k);
+    opf_PDF(Train_cpy);
+    opf_OPFClustering4SupervisedLearning(Train_cpy);
+    //classificar
+    //acuracia
+    
+    if(Acc > MaxAcc){
+      MaxAcc = Acc;
+      bestk = k;
+    }
+    
+    opf_DestroyArcs(Train_cpy);
+  }
+  
+  return bestk;
+}
+
+void opf_OPFClustering4SupervisedLearning(Subgraph *sg){
+    Set *adj_i,*adj_j;
+    char insert_i;
+    int i,j;
+    int p, q;
+    double tmp,*pathval=NULL;
+    RealHeap *Q=NULL;
+    Set *Saux=NULL;
+
+    //   Add arcs to guarantee symmetry on plateaus
+    for (i=0; i < sg->nnodes; i++){
+        adj_i = sg->node[i].adj;
+        while (adj_i != NULL){
+            j  = adj_i->elem;
+            if (sg->node[i].dens==sg->node[j].dens){
+                // insert i in the adjacency of j if it is not there.
+                adj_j    = sg->node[j].adj;
+                insert_i = 1;
+                while (adj_j != NULL){
+                    if (i == adj_j->elem){
+                        insert_i=0;
+                        break;
+                    }
+                    adj_j=adj_j->next;
+                }
+                if (insert_i)
+                    InsertSet(&(sg->node[j].adj),i);
+            }
+            adj_i=adj_i->next;
+        }
+    }
+
+    // Compute clustering
+
+    pathval = AllocFloatArray(sg->nnodes);
+    Q = CreateRealHeap(sg->nnodes, pathval);
+    SetRemovalPolicyRealHeap(Q, MAXVALUE);
+
+    for (p = 0; p < sg->nnodes; p++){
+        pathval[ p ] = sg->node[ p ].pathval;
+        sg->node[ p ].pred  = NIL;
+        sg->node[ p ].root  = p;
+        InsertRealHeap(Q, p);
+    }
+
+    i = 0;
+    while (!IsEmptyRealHeap(Q)){
+        RemoveRealHeap(Q,&p);
+	sg->ordered_list_of_nodes[i]=p; i++;
+
+        if ( sg->node[ p ].pred == NIL ){
+	  pathval[ p ] = sg->node[ p ].dens;
+	  sg->node[p].label=sg->node[p].truelabel;
+        }
+
+        sg->node[ p ].pathval = pathval[ p ];
+        for ( Saux = sg->node[ p ].adj; Saux != NULL; Saux = Saux->next ){
+	  q = Saux->elem;
+	  if ( Q->color[q] != BLACK ) {
+	    tmp = MIN( pathval[ p ], sg->node[ q ].dens);
+	    if ( tmp > pathval[ q ] ){
+	      UpdateRealHeap(Q,q,tmp);
+	      sg->node[ q ].pred  = p;
+	      sg->node[ q ].root  = sg->node[ p ].root;
+	      sg->node[ q ].label = sg->node[ p ].label;
+	    }
+	  }
+        }
+    }
+
+    DestroyRealHeap( &Q );
+    free( pathval );
+}
+
 /*--------- UnSupervised OPF -------------------------------------*/
 //Training function: it computes unsupervised training for the
 //pre-computed best k.
