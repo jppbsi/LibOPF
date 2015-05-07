@@ -1,14 +1,14 @@
-#ifndef _SUBGRAPH_H_
-#define _SUBGRAPH_H_
+#ifndef _SUBGRAPH_H_
+#define _SUBGRAPH_H_
 
 #include "common.h"
 #include "set.h"
 
 /*--------- Data types ----------------------------- */
 typedef struct _snode {
-  float pathval; //path value
-  float dens;    //node density
-  float radius;   // maximum distance among the k-nearest neighbors in
+  double pathval; //path value
+  double dens;    //node density
+  double radius;   // maximum distance among the k-nearest neighbors in
 		  // the training set. It is used to propagate
 		  // clustering labels to testing nodes)
   int   label;   //node label
@@ -16,7 +16,7 @@ typedef struct _snode {
   int   pred;    //predecessor node
   int   truelabel; //true label if it is known
   int   position;  //index in the feature space
-  float *feat;    //feature vector
+  double *feat;    //feature vector
   char  status;  //0 - nothing, 1 - prototype
   char  relevant; //0 - irrelevant, 1 - relevant
 
@@ -35,10 +35,10 @@ typedef struct _subgraph {
   int   nfeats;  //number of features
   int   bestk;   //number of adjacent nodes
   int   nlabels; //number of clusters
-  float df;      //radius in the feature space for density computation
-  float mindens; //minimum density value
-  float maxdens; //maximum density value
-  float K;       //Constant for opf_PDF computation
+  double df;      //radius in the feature space for density computation
+  double mindens; //minimum density value
+  double maxdens; //maximum density value
+  double K;       //Constant for opf_PDF computation
   int  *ordered_list_of_nodes; // Store the list of nodes in the increasing order of cost for speeding up supervised classification.
 } Subgraph;
 
@@ -51,5 +51,5 @@ Subgraph *ReadSubgraph(char *file);//read subgraph from opf format file
 Subgraph *CopySubgraph(Subgraph *g);//Copy subgraph (does not copy Arcs)
 
 void CopySNode(SNode *dest, SNode *src, int nfeats); //Copy nodes
-void SwapSNode(SNode *a, SNode *b); //Swap nodes
-#endif // _SUBGRAPH_H_
+void SwapSNode(SNode *a, SNode *b); //Swap nodes
+#endif // _SUBGRAPH_H_
