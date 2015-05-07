@@ -53,7 +53,7 @@ void opf_OPFTraining(Subgraph *sg){
       sg->node[p].label  = sg->node[p].truelabel;
       InsertRealHeap(Q, p);
     }else{ // non-prototypes
-      pathval[p]  = FLT_MAX;
+      pathval[p]  = DBL_MAX;
     }
   }
 
@@ -169,7 +169,7 @@ Subgraph *opf_OPFSemiLearning(Subgraph *sg, Subgraph *nonsg, Subgraph *sgeval){
       merged->node[p].label  = merged->node[p].truelabel;
       InsertRealHeap(Q, p);
     }else{ // non-prototypes
-      pathval[p]  = FLT_MAX;
+      pathval[p]  = DBL_MAX;
     }
   }
   // IFT with fmax
@@ -234,7 +234,7 @@ void opf_OPFKNNClassify(Subgraph *sgtrain, Subgraph *sg){
 //training set -----
 void opf_OPFLearning(Subgraph **sgtrain, Subgraph **sgeval){
 	int i = 0, iterations = 10;
-	double Acc = FLT_MIN, AccAnt = FLT_MIN,MaxAcc=FLT_MIN, delta;
+	double Acc = DBL_MIN, AccAnt = DBL_MIN,MaxAcc=DBL_MIN, delta;
 	Subgraph *sg=NULL;
 
 	do{
@@ -662,7 +662,7 @@ void opf_MSTPrototypes(Subgraph *sg){
   Q = CreateRealHeap(sg->nnodes, pathval);
 
   for (p = 0; p < sg->nnodes; p++) {
-    pathval[ p ] = FLT_MAX;
+    pathval[ p ] = DBL_MAX;
     sg->node[p].status=0;
   }
 
@@ -1123,7 +1123,7 @@ double opf_NormalizedCut( Subgraph *sg ){
 void opf_BestkMinCut(Subgraph *sg, int kmin, int kmax)
 {
     int k, bestk = kmax;
-    double mincut=FLT_MAX,nc;
+    double mincut=DBL_MAX,nc;
 
     double* maxdists = opf_CreateArcs2(sg,kmax); // stores the maximum distances for every k=1,2,...,kmax
 
@@ -1170,7 +1170,7 @@ void opf_CreateArcs(Subgraph *sg, int knn){
     for (i=0; i < sg->nnodes; i++)
     {
         for (l=0; l < knn; l++)
-            d[l]=FLT_MAX;
+            d[l]=DBL_MAX;
         for (j=0; j < sg->nnodes; j++)
         {
             if (j!=i)
@@ -1232,8 +1232,8 @@ void opf_PDF(Subgraph *sg){
     Set    *adj=NULL;
 
     sg->K    = (2.0*(double)sg->df/9.0);
-    sg->mindens = FLT_MAX;
-    sg->maxdens = FLT_MIN;
+    sg->mindens = DBL_MAX;
+    sg->maxdens = DBL_MIN;
     for (i=0; i < sg->nnodes; i++)
     {
         adj=sg->node[i].adj;
@@ -1451,7 +1451,7 @@ double* opf_CreateArcs2(Subgraph *sg, int kmax)
     for (i=0; i < sg->nnodes; i++)
     {
         for (l=0; l < kmax; l++)
-            d[l]=FLT_MAX;
+            d[l]=DBL_MAX;
         for (j=0; j < sg->nnodes; j++)
         {
             if (j!=i)
@@ -1479,7 +1479,7 @@ double* opf_CreateArcs2(Subgraph *sg, int kmax)
         //making sure that the adjacent nodes be sorted in non-decreasing order
         for (l=kmax-1; l >= 0; l--)
         {
-            if (d[l]!=FLT_MAX)
+            if (d[l]!=DBL_MAX)
             {
                 if (d[l] > sg->df)
                     sg->df = d[l];
@@ -1615,8 +1615,8 @@ void opf_PDFtoKmax(Subgraph *sg)
 
     sg->K    = (2.0*(double)sg->df/9.0);
 
-    sg->mindens = FLT_MAX;
-    sg->maxdens = FLT_MIN;
+    sg->mindens = DBL_MAX;
+    sg->maxdens = DBL_MIN;
     for (i=0; i < sg->nnodes; i++)
     {
         adj=sg->node[i].adj;

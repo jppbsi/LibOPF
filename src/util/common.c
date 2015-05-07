@@ -34,10 +34,10 @@ int *AllocIntArray(int n)
   return(v);
 }
 
-float *AllocFloatArray(int n)
+double *AllocFloatArray(int n)
 {
-  float *v=NULL;
-  v = (float *) calloc(n,sizeof(float));
+  double *v=NULL;
+  v = (double *) calloc(n,sizeof(double));
   if (v == NULL)
     Error(MSG1,"AllocFloatArray");
   return(v);

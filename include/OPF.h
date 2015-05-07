@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <sys/time.h>
 #include <ctype.h>
+#include <float.h>
 
 #include "common.h"
 #include "set.h"
