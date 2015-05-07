@@ -26,7 +26,7 @@
 #include "OPF.h"
 
 char	opf_PrecomputedDistance;
-double  **opf_DistanceValue;
+float  **opf_DistanceValue;
 
 opf_ArcWeightFun opf_ArcWeight = opf_EuclDistLog;
 
@@ -34,9 +34,9 @@ opf_ArcWeightFun opf_ArcWeight = opf_EuclDistLog;
 //Training function -----
 void opf_OPFTraining(Subgraph *sg){
   int p,q, i;
-  double tmp,weight;
+  float tmp,weight;
   RealHeap *Q = NULL;
-  double *pathval = NULL;
+  float *pathval = NULL;
 
   // compute optimum prototypes
   opf_MSTPrototypes(sg);
@@ -91,7 +91,7 @@ void opf_OPFTraining(Subgraph *sg){
 void opf_OPFClassifying(Subgraph *sgtrain, Subgraph *sg)
 {
   int i, j, k, l, label = -1;
-  double tmp, weight, minCost;
+  float tmp, weight, minCost;
 
   for (i = 0; i < sg->nnodes; i++)
   {
@@ -130,9 +130,9 @@ void opf_OPFClassifying(Subgraph *sgtrain, Subgraph *sg)
 Subgraph *opf_OPFSemiLearning(Subgraph *sg, Subgraph *nonsg, Subgraph *sgeval){
 
   int p,q, i, cont;
-  double tmp,weight;
+  float tmp,weight;
   RealHeap *Q = NULL;
-  double *pathval = NULL;
+  float *pathval = NULL;
 
   Subgraph *merged = opf_MergeSubgraph(sg,nonsg);
   cont = 0;
@@ -211,7 +211,7 @@ Subgraph *opf_OPFSemiLearning(Subgraph *sg, Subgraph *nonsg, Subgraph *sgeval){
 
 void opf_OPFKNNClassify(Subgraph *sgtrain, Subgraph *sg){
   int   i, j, k;
-  double weight;
+  float weight;
 
   for (i = 0; i < sg->nnodes; i++){
     for (j = 0; (j < sgtrain->nnodes); j++){
@@ -234,7 +234,7 @@ void opf_OPFKNNClassify(Subgraph *sgtrain, Subgraph *sg){
 //training set -----
 void opf_OPFLearning(Subgraph **sgtrain, Subgraph **sgeval){
 	int i = 0, iterations = 10;
-	double Acc = FLT_MIN, AccAnt = FLT_MIN,MaxAcc=FLT_MIN, delta;
+	float Acc = FLT_MIN, AccAnt = FLT_MIN,MaxAcc=FLT_MIN, delta;
 	Subgraph *sg=NULL;
 
 	do{
@@ -260,7 +260,7 @@ void opf_OPFLearning(Subgraph **sgtrain, Subgraph **sgeval){
 
 void opf_OPFAgglomerativeLearning(Subgraph **sgtrain, Subgraph **sgeval){
     int n, i = 1;
-    double Acc;
+    float Acc;
 
     /*while  there exists misclassified samples in sgeval*/
     do{
@@ -283,7 +283,7 @@ void opf_OPFClustering(Subgraph *sg){
     char insert_i;
     int i,j;
     int p, q, l;
-    double tmp,*pathval=NULL;
+    float tmp,*pathval=NULL;
     RealHeap *Q=NULL;
     Set *Saux=NULL;
 
@@ -524,13 +524,13 @@ void opf_WriteModelFile(Subgraph *g, char *file){
    fwrite(&g->nfeats, sizeof(int), 1, fp);
 
   /*writing df*/
-   fwrite(&g->df, sizeof(double), 1, fp);
+   fwrite(&g->df, sizeof(float), 1, fp);
 
   // for supervised opf based on pdf
 
-   fwrite(&g->K, sizeof(double), 1, fp);
-   fwrite(&g->mindens, sizeof(double), 1, fp);
-   fwrite(&g->maxdens, sizeof(double), 1, fp);
+   fwrite(&g->K, sizeof(float), 1, fp);
+   fwrite(&g->mindens, sizeof(float), 1, fp);
+   fwrite(&g->maxdens, sizeof(float), 1, fp);
 
   /*writing position(id), label, pred, pathval and features*/
   for (i = 0; i < g->nnodes; i++){
@@ -538,11 +538,11 @@ void opf_WriteModelFile(Subgraph *g, char *file){
      fwrite(&g->node[i].truelabel, sizeof(int), 1, fp);
      fwrite(&g->node[i].pred, sizeof(int), 1, fp);
      fwrite(&g->node[i].label, sizeof(int), 1, fp);
-     fwrite(&g->node[i].pathval, sizeof(double), 1, fp);
-     fwrite(&g->node[i].radius, sizeof(double), 1, fp);
+     fwrite(&g->node[i].pathval, sizeof(float), 1, fp);
+     fwrite(&g->node[i].radius, sizeof(float), 1, fp);
 
     for (j = 0; j < g->nfeats; j++){
-       fwrite(&g->node[i].feat[j], sizeof(double), 1, fp);
+       fwrite(&g->node[i].feat[j], sizeof(float), 1, fp);
     }
   }
 
@@ -578,24 +578,24 @@ Subgraph *opf_ReadModelFile(char *file){
 
 
   /*reading df*/
-  if (fread(&g->df, sizeof(double), 1, fp) != 1) 
+  if (fread(&g->df, sizeof(float), 1, fp) != 1) 
     Error("Could not read adjacency radius","opf_ReadModelFile");
 
 
   // for supervised opf by pdf
 
-  if (fread(&g->K, sizeof(double), 1, fp) != 1) 
+  if (fread(&g->K, sizeof(float), 1, fp) != 1) 
     Error("Could not read the best K","opf_ReadModelFile");
     
-  if (fread(&g->mindens, sizeof(double), 1, fp) != 1) 
+  if (fread(&g->mindens, sizeof(float), 1, fp) != 1) 
     Error("Could not read minimum density","opf_ReadModelFile");
 
-  if (fread(&g->maxdens, sizeof(double), 1, fp) != 1) 
+  if (fread(&g->maxdens, sizeof(float), 1, fp) != 1) 
     Error("Could not read maximum density","opf_ReadModelFile");
 
   /*reading features*/
   for (i = 0; i < g->nnodes; i++){
-    g->node[i].feat = (double *)malloc(g->nfeats*sizeof(double));
+    g->node[i].feat = (float *)malloc(g->nfeats*sizeof(float));
     if (fread(&g->node[i].position, sizeof(int), 1, fp) != 1) 
       Error("Could not read node position","opf_ReadModelFile");
     if (fread(&g->node[i].truelabel, sizeof(int), 1, fp) != 1) 
@@ -604,13 +604,13 @@ Subgraph *opf_ReadModelFile(char *file){
       Error("Could not read node predecessor","opf_ReadModelFile");
     if (fread(&g->node[i].label, sizeof(int), 1, fp) != 1) 
       Error("Could not read node label","opf_ReadModelFile");
-    if (fread(&g->node[i].pathval, sizeof(double), 1, fp) != 1) 
+    if (fread(&g->node[i].pathval, sizeof(float), 1, fp) != 1) 
       Error("Could not read node path value","opf_ReadModelFile");
-    if (fread(&g->node[i].radius, sizeof(double), 1, fp) != 1) 
+    if (fread(&g->node[i].radius, sizeof(float), 1, fp) != 1) 
       Error("Could not read node adjacency radius","opf_ReadModelFile");
 
     for (j = 0; j < g->nfeats; j++){
-      if (fread(&g->node[i].feat[j], sizeof(double), 1, fp) != 1) 
+      if (fread(&g->node[i].feat[j], sizeof(float), 1, fp) != 1) 
 	Error("Could not read node features","opf_ReadModelFile");
     }
   }
@@ -627,7 +627,7 @@ Subgraph *opf_ReadModelFile(char *file){
 
 //normalize features
 void opf_NormalizeFeatures(Subgraph *sg){
-  double *mean = (double *)calloc(sg->nfeats,sizeof(double)), *std = (double *)calloc(sg->nfeats, sizeof(int));
+  float *mean = (float *)calloc(sg->nfeats,sizeof(float)), *std = (float *)calloc(sg->nfeats, sizeof(int));
   int i,j;
 
   for (i = 0; i < sg->nfeats; i++){
@@ -651,11 +651,11 @@ void opf_NormalizeFeatures(Subgraph *sg){
 // Find prototypes by the MST approach
 void opf_MSTPrototypes(Subgraph *sg){
   int p,q;
-  double weight;
+  float weight;
   RealHeap *Q=NULL;
-  double *pathval = NULL;
+  float *pathval = NULL;
   int  pred;
-  double nproto;
+  float nproto;
 
   // initialization
   pathval = AllocFloatArray(sg->nnodes);
@@ -723,7 +723,7 @@ Subgraph **kFoldSubgraph(Subgraph *sg, int k){
 	}
 
 	for (i=0; i < sg->nnodes; i++)
-	    nelems[sg->node[i].truelabel]=MAX((int)((1/(double)k)*label[sg->node[i].truelabel]),1);
+	    nelems[sg->node[i].truelabel]=MAX((int)((1/(float)k)*label[sg->node[i].truelabel]),1);
 
 	for (i = 1; i <= sg->nlabels; i++){
 		foldsize+=nelems[i];
@@ -736,7 +736,7 @@ Subgraph **kFoldSubgraph(Subgraph *sg, int k){
 		out[i]->nfeats = sg->nfeats;
 		out[i]->nlabels = sg->nlabels;
 		for (j = 0; j < foldsize; j++)
-			out[i]->node[j].feat = (double *)malloc(sg->nfeats*sizeof(double));
+			out[i]->node[j].feat = (float *)malloc(sg->nfeats*sizeof(float));
 	}
 
 	totelems = 0;
@@ -748,7 +748,7 @@ Subgraph **kFoldSubgraph(Subgraph *sg, int k){
 	out[i]->nlabels = sg->nlabels;
 
 	for (j = 0; j < foldsize+totelems; j++)
-			out[i]->node[j].feat = (double *)malloc(sg->nfeats*sizeof(double));
+			out[i]->node[j].feat = (float *)malloc(sg->nfeats*sizeof(float));
 
 	for (i = 0; i < k; i++){
 		totelems=0;
@@ -815,7 +815,7 @@ Subgraph **opf_kFoldSubgraph(Subgraph *sg, int k){
 	}
 
 	for (i=0; i < sg->nnodes; i++)
-	    nelems[sg->node[i].truelabel]=MAX((int)((1/(double)k)*label[sg->node[i].truelabel]),1);
+	    nelems[sg->node[i].truelabel]=MAX((int)((1/(float)k)*label[sg->node[i].truelabel]),1);
 
 	for (i = 1; i <= sg->nlabels; i++){
 		foldsize+=nelems[i];
@@ -828,7 +828,7 @@ Subgraph **opf_kFoldSubgraph(Subgraph *sg, int k){
 		out[i]->nfeats = sg->nfeats;
 		out[i]->nlabels = sg->nlabels;
 		for (j = 0; j < foldsize; j++)
-			out[i]->node[j].feat = (double *)malloc(sg->nfeats*sizeof(double));
+			out[i]->node[j].feat = (float *)malloc(sg->nfeats*sizeof(float));
 	}
 
 	totelems = 0;
@@ -840,7 +840,7 @@ Subgraph **opf_kFoldSubgraph(Subgraph *sg, int k){
 	out[i]->nlabels = sg->nlabels;
 
 	for (j = 0; j < foldsize+totelems; j++)
-			out[i]->node[j].feat = (double *)malloc(sg->nfeats*sizeof(double));
+			out[i]->node[j].feat = (float *)malloc(sg->nfeats*sizeof(float));
 
 	for (i = 0; i < k; i++){
 		totelems=0;
@@ -897,7 +897,7 @@ Subgraph **opf_kFoldSubgraph(Subgraph *sg, int k){
 
 // Split subgraph into two parts such that the size of the first part
 // is given by a percentual of samples.
-void opf_SplitSubgraph(Subgraph *sg, Subgraph **sg1, Subgraph **sg2, double perc1){
+void opf_SplitSubgraph(Subgraph *sg, Subgraph **sg1, Subgraph **sg2, float perc1){
   int *label=AllocIntArray(sg->nlabels+1),i,j,i1,i2;
   int *nelems=AllocIntArray(sg->nlabels+1),totelems;
   srandom((int)time(NULL));
@@ -983,13 +983,13 @@ Subgraph *opf_MergeSubgraph(Subgraph *sg1, Subgraph *sg2){
 }
 
 // Compute accuracy
-double opf_Accuracy(Subgraph *sg){
-	double Acc = 0.0f, **error_matrix = NULL, error = 0.0f;
+float opf_Accuracy(Subgraph *sg){
+	float Acc = 0.0f, **error_matrix = NULL, error = 0.0f;
 	int i, *nclass = NULL, nlabels=0;
 
-	error_matrix = (double **)calloc(sg->nlabels+1, sizeof(double *));
+	error_matrix = (float **)calloc(sg->nlabels+1, sizeof(float *));
 	for(i=0; i<= sg->nlabels; i++)
-	  error_matrix[i] = (double *)calloc(2, sizeof(double));
+	  error_matrix[i] = (float *)calloc(2, sizeof(float));
 
 	nclass = AllocIntArray(sg->nlabels+1);
 
@@ -1006,8 +1006,8 @@ double opf_Accuracy(Subgraph *sg){
 
 	for(i=1; i <= sg->nlabels; i++){
 	  if (nclass[i]!=0){
-	    error_matrix[i][1] /= (double)nclass[i];
-	    error_matrix[i][0] /= (double)(sg->nnodes - nclass[i]);
+	    error_matrix[i][1] /= (float)nclass[i];
+	    error_matrix[i][0] /= (float)(sg->nnodes - nclass[i]);
 	    nlabels++;
 	  }
 	}
@@ -1043,11 +1043,11 @@ int **opf_ConfusionMatrix(Subgraph *sg){
 
 
 //read distances from precomputed distances file
-double **opf_ReadDistances(char *fileName, int *n)
+float **opf_ReadDistances(char *fileName, int *n)
 {
   int nsamples, i;
   FILE *fp = NULL;
-  double **M = NULL;
+  float **M = NULL;
   char msg[256];
   
   fp = fopen(fileName,"rb");
@@ -1061,12 +1061,12 @@ double **opf_ReadDistances(char *fileName, int *n)
     Error("Could not read number of samples","opf_ReadDistances");
   
   *n = nsamples;
-  M = (double **)malloc(nsamples*sizeof(double *));
+  M = (float **)malloc(nsamples*sizeof(float *));
   
   for (i = 0; i < nsamples; i++)
     {
-      M[i] = (double *) malloc( nsamples*sizeof(double));
-      if( fread(M[i], sizeof(double), nsamples, fp) != nsamples ){ 
+      M[i] = (float *) malloc( nsamples*sizeof(float));
+      if( fread(M[i], sizeof(float), nsamples, fp) != nsamples ){ 
 	Error("Could not read samples","opf_ReadDistances");		
       }
     }
@@ -1076,12 +1076,12 @@ double **opf_ReadDistances(char *fileName, int *n)
 }
 
 // Normalized cut
-double opf_NormalizedCut( Subgraph *sg ){
+float opf_NormalizedCut( Subgraph *sg ){
     int l, p, q;
     Set *Saux;
-    double ncut, dist;
-    double *acumIC; //acumulate weights inside each class
-    double *acumEC; //acumulate weights between the class and a distinct one
+    float ncut, dist;
+    float *acumIC; //acumulate weights inside each class
+    float *acumEC; //acumulate weights between the class and a distinct one
 
     ncut = 0.0;
     acumIC = AllocFloatArray( sg->nlabels );
@@ -1112,7 +1112,7 @@ double opf_NormalizedCut( Subgraph *sg ){
 
     for ( l = 0; l < sg->nlabels; l++ )
     {
-        if ( acumIC[ l ] + acumEC[ l ]  > 0.0 ) ncut += (double) acumEC[ l ] / ( acumIC[ l ] + acumEC[ l ] );
+        if ( acumIC[ l ] + acumEC[ l ]  > 0.0 ) ncut += (float) acumEC[ l ] / ( acumIC[ l ] + acumEC[ l ] );
     }
     free( acumEC );
     free( acumIC );
@@ -1123,9 +1123,9 @@ double opf_NormalizedCut( Subgraph *sg ){
 void opf_BestkMinCut(Subgraph *sg, int kmin, int kmax)
 {
     int k, bestk = kmax;
-    double mincut=FLT_MAX,nc;
+    float mincut=FLT_MAX,nc;
 
-    double* maxdists = opf_CreateArcs2(sg,kmax); // stores the maximum distances for every k=1,2,...,kmax
+    float* maxdists = opf_CreateArcs2(sg,kmax); // stores the maximum distances for every k=1,2,...,kmax
 
     // Find the best k
     for (k = kmin; (k <= kmax)&&(mincut != 0.0); k++)
@@ -1160,9 +1160,9 @@ void opf_BestkMinCut(Subgraph *sg, int kmin, int kmax)
 // Create adjacent list in subgraph: a knn graph
 void opf_CreateArcs(Subgraph *sg, int knn){
     int    i,j,l,k;
-    double  dist;
+    float  dist;
     int   *nn=AllocIntArray(knn+1);
-    double *d=AllocFloatArray(knn+1);
+    float *d=AllocFloatArray(knn+1);
 
     /* Create graph with the knn-nearest neighbors */
 
@@ -1228,10 +1228,10 @@ void opf_DestroyArcs(Subgraph *sg){
 void opf_PDF(Subgraph *sg){
     int     i,nelems;
     double  dist;
-    double  *value=AllocFloatArray(sg->nnodes);
+    float  *value=AllocFloatArray(sg->nnodes);
     Set    *adj=NULL;
 
-    sg->K    = (2.0*(double)sg->df/9.0);
+    sg->K    = (2.0*(float)sg->df/9.0);
     sg->mindens = FLT_MAX;
     sg->maxdens = FLT_MIN;
     for (i=0; i < sg->nnodes; i++)
@@ -1250,7 +1250,7 @@ void opf_PDF(Subgraph *sg){
             nelems++;
         }
 
-        value[i] = (value[i]/(double)nelems);
+        value[i] = (value[i]/(float)nelems);
 
         if (value[i] < sg->mindens)
             sg->mindens = value[i];
@@ -1272,7 +1272,7 @@ void opf_PDF(Subgraph *sg){
       {
         for (i=0; i < sg->nnodes; i++)
 	  {
-	    sg->node[i].dens = ((double)(opf_MAXDENS-1)*(value[i]-sg->mindens)/(double)(sg->maxdens-sg->mindens))+1.0;
+	    sg->node[i].dens = ((float)(opf_MAXDENS-1)*(value[i]-sg->mindens)/(float)(sg->maxdens-sg->mindens))+1.0;
             sg->node[i].pathval=sg->node[i].dens-1;
         }
     }
@@ -1280,7 +1280,7 @@ void opf_PDF(Subgraph *sg){
 }
 
 // Eliminate maxima in the graph with pdf below H
-void opf_ElimMaxBelowH(Subgraph *sg, double H){
+void opf_ElimMaxBelowH(Subgraph *sg, float H){
     int i;
 
     if (H>0.0)
@@ -1319,9 +1319,9 @@ void opf_ElimMaxBelowVolume(Subgraph *sg, int V){
 /*------------ Distance functions ------------------------------ */
 
 // Compute Euclidean distance between feature vectors
-double opf_EuclDist(double *f1, double *f2, int n){
+float opf_EuclDist(float *f1, float *f2, int n){
   int i;
-  double dist=0.0f;
+  float dist=0.0f;
 
   for (i=0; i < n; i++)
     dist += (f1[i]-f2[i])*(f1[i]-f2[i]);
@@ -1331,14 +1331,14 @@ double opf_EuclDist(double *f1, double *f2, int n){
 
 
 // Discretizes original distance
-double opf_EuclDistLog(double *f1, double *f2, int n){
-  return(((double)opf_MAXARCW*log(opf_EuclDist(f1,f2,n)+1)));
+float opf_EuclDistLog(float *f1, float *f2, int n){
+  return(((float)opf_MAXARCW*log(opf_EuclDist(f1,f2,n)+1)));
 }
 
 // Compute gaussian distance between feature vectors
- double opf_GaussDist(double *f1, double *f2, int n, double gamma){
+ float opf_GaussDist(float *f1, float *f2, int n, float gamma){
   int i;
-  double dist=0.0f;
+  float dist=0.0f;
 
   for (i=0; i < n; i++)
     dist += (f1[i]-f2[i])*(f1[i]-f2[i]);
@@ -1349,9 +1349,9 @@ double opf_EuclDistLog(double *f1, double *f2, int n){
 }
 
 // Compute  chi-squared distance between feature vectors
-double opf_ChiSquaredDist(double *f1, double *f2, int n){
+float opf_ChiSquaredDist(float *f1, float *f2, int n){
 	int i;
-	double dist=0.0f, sf1 = 0.0f, sf2 = 0.0f;
+	float dist=0.0f, sf1 = 0.0f, sf2 = 0.0f;
 
 	for (i = 0; i < n; i++){
 		sf1+=f1[i];
@@ -1365,9 +1365,9 @@ double opf_ChiSquaredDist(double *f1, double *f2, int n){
 }
 
 // Compute  Manhattan distance between feature vectors
-double opf_ManhattanDist(double *f1, double *f2, int n){
+float opf_ManhattanDist(float *f1, float *f2, int n){
   int i;
-  double dist=0.0f;
+  float dist=0.0f;
 
   for (i=0; i < n; i++)
     dist += fabs(f1[i]-f2[i]);
@@ -1376,9 +1376,9 @@ double opf_ManhattanDist(double *f1, double *f2, int n){
 }
 
 // Compute  Camberra distance between feature vectors
-double opf_CanberraDist(double *f1, double *f2, int n){
+float opf_CanberraDist(float *f1, float *f2, int n){
   int i;
-  double dist=0.0f, aux;
+  float dist=0.0f, aux;
 
   for (i=0; i < n; i++){
 	  aux = fabs(f1[i]+f2[i]);
@@ -1390,9 +1390,9 @@ double opf_CanberraDist(double *f1, double *f2, int n){
 }
 
 // Compute  Squared Chord distance between feature vectors
-double opf_SquaredChordDist(double *f1, double *f2, int n){
+float opf_SquaredChordDist(float *f1, float *f2, int n){
   int i;
-  double dist=0.0f, aux1, aux2;
+  float dist=0.0f, aux1, aux2;
 
   for (i=0; i < n; i++){
 	  aux1 = sqrtf(f1[i]);
@@ -1406,9 +1406,9 @@ double opf_SquaredChordDist(double *f1, double *f2, int n){
 }
 
 // Compute  Squared Chi-squared distance between feature vectors
-double opf_SquaredChiSquaredDist(double *f1, double *f2, int n){
+float opf_SquaredChiSquaredDist(float *f1, float *f2, int n){
   int i;
-  double dist=0.0f, aux;
+  float dist=0.0f, aux;
 
   for (i=0; i < n; i++){
 	  aux = fabs(f1[i]+f2[i]);
@@ -1420,9 +1420,9 @@ double opf_SquaredChiSquaredDist(double *f1, double *f2, int n){
 }
 
 // Compute  Bray Curtis distance between feature vectors
-double opf_BrayCurtisDist(double *f1, double *f2, int n){
+float opf_BrayCurtisDist(float *f1, float *f2, int n){
   int i;
-  double dist=0.0f, aux;
+  float dist=0.0f, aux;
 
   for (i=0; i < n; i++){
 	  aux = f1[i]+f2[i];
@@ -1438,13 +1438,13 @@ double opf_BrayCurtisDist(double *f1, double *f2, int n){
 // Create adjacent list in subgraph: a knn graph.
 // Returns an array with the maximum distances
 // for each k=1,2,...,kmax
-double* opf_CreateArcs2(Subgraph *sg, int kmax)
+float* opf_CreateArcs2(Subgraph *sg, int kmax)
 {
     int    i,j,l,k;
-    double  dist;
+    float  dist;
     int   *nn=AllocIntArray(kmax+1);
-    double *d=AllocFloatArray(kmax+1);
-    double *maxdists=AllocFloatArray(kmax);
+    float *d=AllocFloatArray(kmax+1);
+    float *maxdists=AllocFloatArray(kmax);
     /* Create graph with the knn-nearest neighbors */
 
     sg->df=0.0;
@@ -1509,7 +1509,7 @@ void opf_OPFClusteringToKmax(Subgraph *sg)
     int i,j;
     int p, q, l, ki,kj;
     const int kmax = sg->bestk;
-    double tmp,*pathval=NULL;
+    float tmp,*pathval=NULL;
     RealHeap *Q=NULL;
     Set *Saux=NULL;
 
@@ -1610,10 +1610,10 @@ void opf_PDFtoKmax(Subgraph *sg)
     int     i,nelems;
     const int kmax = sg->bestk;
     double  dist;
-    double  *value=AllocFloatArray(sg->nnodes);
+    float  *value=AllocFloatArray(sg->nnodes);
     Set    *adj=NULL;
 
-    sg->K    = (2.0*(double)sg->df/9.0);
+    sg->K    = (2.0*(float)sg->df/9.0);
 
     sg->mindens = FLT_MAX;
     sg->maxdens = FLT_MIN;
@@ -1637,7 +1637,7 @@ void opf_PDFtoKmax(Subgraph *sg)
             nelems++;
         }
 
-        value[i] = (value[i]/(double)nelems);
+        value[i] = (value[i]/(float)nelems);
 
         if (value[i] < sg->mindens)
             sg->mindens = value[i];
@@ -1657,7 +1657,7 @@ void opf_PDFtoKmax(Subgraph *sg)
     {
         for (i=0; i < sg->nnodes; i++)
         {
-            sg->node[i].dens = ((double)(opf_MAXDENS-1)*(value[i]-sg->mindens)/(double)(sg->maxdens-sg->mindens))+1.0;
+            sg->node[i].dens = ((float)(opf_MAXDENS-1)*(value[i]-sg->mindens)/(float)(sg->maxdens-sg->mindens))+1.0;
             sg->node[i].pathval=sg->node[i].dens-1;
         }
     }
@@ -1666,14 +1666,14 @@ void opf_PDFtoKmax(Subgraph *sg)
 
 
 // Normalized cut computed only for sg->bestk neighbors
-double opf_NormalizedCutToKmax( Subgraph *sg )
+float opf_NormalizedCutToKmax( Subgraph *sg )
 {
     int l, p, q, k;
     const int kmax = sg->bestk;
     Set *Saux;
-    double ncut, dist;
-    double *acumIC; //acumulate weights inside each class
-    double *acumEC; //acumulate weights between the class and a distinct one
+    float ncut, dist;
+    float *acumIC; //acumulate weights inside each class
+    float *acumEC; //acumulate weights between the class and a distinct one
 
     ncut = 0.0;
     acumIC = AllocFloatArray( sg->nlabels );
@@ -1707,7 +1707,7 @@ double opf_NormalizedCutToKmax( Subgraph *sg )
 
     for ( l = 0; l < sg->nlabels; l++ )
     {
-        if ( acumIC[ l ] + acumEC[ l ]  > 0.0 ) ncut += (double) acumEC[ l ] / ( acumIC[ l ] + acumEC[ l ] );
+        if ( acumIC[ l ] + acumEC[ l ]  > 0.0 ) ncut += (float) acumEC[ l ] / ( acumIC[ l ] + acumEC[ l ] );
     }
     free( acumEC );
     free( acumIC );
