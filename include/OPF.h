@@ -24,7 +24,7 @@
 #define opf_MAXDENS			1000.0
 #define opf_PROTOTYPE		1
 
-#define opf_version "\nLibOPF version 3.0 (2013)\n"
+#define opf_version "\nLibOPF version 3.1 (2015)\n"
 
 typedef float (*opf_ArcWeightFun)(float *f1, float *f2, int n);
 

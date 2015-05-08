@@ -1,7 +1,7 @@
 LibOPF is a library of functions and programs for free usage in the
 design of optimum-path forest classifiers. This second version 
 contains some additional resources related to the supervised
-OPF classifier reported in reference [PapaIJIST09,PapaPR12], and also
+OPF classifier reported in references [PapaISVC08,PapaIJIST09,PapaPR12], and also
 contains the unsupervised version of OPF reported in reference
 [RochaIJIST09].
 
@@ -28,6 +28,8 @@ precomputed distance file in the format specified in section
 with some options of distance functions, which generates a precomputed
 distance file.
 
+Current version: 3.1 (May, 2015)
+
 
 Table of Contents
 =================
@@ -36,13 +38,14 @@ Table of Contents
 - Programs included
 	SUPERVISED OPF
 		- 'opf_split' Usage
-		- 'opf_train' Usage
-		- 'opf_learn' Usage
-		- 'opf_classify' Usage
+		- 'opf_train' Usage (OPF with complete graph [PapaIJIST09,PapaPR12])
+		- 'opf_learn' Usage (OPF with complete graph [PapaIJIST09,PapaPR12])
+		- 'opf_classify' Usage (OPF with complete graph [PapaIJIST09,PapaPR12])
+		- 'opfknn_train' Usage (OPF with complete graph [PapaISVC08])
+		- 'opfknn_classify' Usage (OPF with complete graph [PapaISVC08])
 		- 'opf_accuracy' Usage
 	UNSUPERVISED OPF
 		- 'opf_cluster' Usage
-		- 'opf_knn_classify' Usage
 	COMMON (Auxiliary functions)
 		- 'opf_distance' Usage
 		- 'opf_normalize' Usage	
@@ -124,17 +127,25 @@ evaluation and test sets.
 
 opf_train:
 
-	This is a program to execute the training phase.
+	This is a program to execute the training phase considering the OPF proposed by [PapaIJIST09,PapaPR12].
 
 opf_learn:
 
 	This is a program to execute the learning phase from
-	classification errors in the evaluation set. It substitutes
+	classification errors in the evaluation set considering the OPF proposed by [PapaIJIST09,PapaPR12]. It substitutes
 	'opf_train'.
 
 opf_classify:
 
-	This is a program to execute the test phase by classifying the test set. 
+	This is a program to execute the test phase by classifying the test set considering the OPF proposed by [PapaIJIST09,PapaPR12]. 
+
+opf_train:
+
+	This is a program to execute the training phase considering the OPF proposed by [PapaISVC08].
+	
+opf_knnclassify:
+
+	This is a program to execute the test phase by classifying the test set considering the OPF proposed by [PapaISVC08]. 
 
 opf_accuracy:
 
@@ -149,14 +160,6 @@ opf_cluster:
         true labels of the roots to the labels of the nodes in their
         respective trees in order to evaluate the quality of the
         clustering. The resulting classifier is written in classifier.opf
-
-opf_knn_classify:
-
-	This program uses the classifier from opf_cluster to assign
-labels to a test or training set. The accuracy of the process makes
-sense only when these sets have true labels. This accuracy can be
-measured by opf_accuracy and it represents the quality of the
-clustering process.
 
 COMMON (Auxiliary functions) -------------
 opf_distance:
@@ -256,6 +259,39 @@ Usage: opf_classify <P1> <P2>
 The opf_classify outputs the following files:
 -> .out: it contains the predicted labels (test phase)
 -> .time: it contains the execution time in seconds (test phase)
+
+'opfknn_train' Usage
+=================
+
+Usage: opfknn_train <P1> <P2> <P3>
+
+	P1: training set in the OPF file format
+	P2: kmax (maximum value for the k-neighborhood)
+	P3: precomputed distance file 
+	(leave it in blank if you are not using this resource)
+
+The program designs a classifier from training.opf and outputs it in a
+file named classifier.opf, which is used by 'opfknn_classify' for
+testing.
+
+The opf_train also outputs the following files:
+-> .out: it contains the predicted labels (training phase)
+-> .time: it contains the execution time in seconds (training phase)
+-> .acc: it contains the accuracy (training phase)
+
+'opfknn_classify' Usage
+====================
+
+Usage: opf_classify <P1> <P2>
+	P1: test/training set in the OPF file format
+	P2: precomputed distance file 
+	(leave it in blank if you are not using this resource)
+
+
+The opf_classify outputs the following files:
+-> .out: it contains the predicted labels (test phase)
+-> .time: it contains the execution time in seconds (test phase)
+
 
 'opf_accuracy' Usage
 ====================
