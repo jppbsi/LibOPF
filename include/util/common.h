@@ -6,6 +6,7 @@
 #include <math.h>
 #include <string.h>
 #include <limits.h>
+#include <float.h>
 
 /* Error messages */
 
@@ -41,7 +42,7 @@ typedef struct timeval timer;
 #endif
 
 int    *AllocIntArray(int n);   /* It allocates 1D array of n integers */
-double  *AllocDoubleArray(int n); /* It allocates 1D array of n doubles */
+float  *AllocFloatArray(int n); /* It allocates 1D array of n floats */
 
 void Error(char *msg,char *func); /* It prints error message and exits
                                      the program. */

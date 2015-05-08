@@ -17,7 +17,7 @@ int main(int argc, char **argv){
 	}
 
 	int n,i;
-	double time;
+	float time;
 	char fileName[256];
 	FILE *f = NULL;
 	timer tic, toc;

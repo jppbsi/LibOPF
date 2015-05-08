@@ -28,13 +28,13 @@ int main(int argc, char **argv){
 	Subgraph *sg = ReadSubgraph(argv[1]);
 	FILE *fp = fopen("distances.dat", "wb");
 	int i, j, distance = atoi(argv[2]), normalize = atoi(argv[3]);
-	double **Distances = NULL, max = FLT_MIN;
+	float **Distances = NULL, max = FLT_MIN;
 
 	fwrite(&sg->nnodes, sizeof(int), 1, fp);
 
-	Distances  = (double **)malloc(sg->nnodes*sizeof(double *));
+	Distances  = (float **)malloc(sg->nnodes*sizeof(float *));
 	for (i = 0; i < sg->nnodes; i++)
-		Distances[i] = (double *)malloc(sg->nnodes*sizeof(int));
+		Distances[i] = (float *)malloc(sg->nnodes*sizeof(int));
 
 	switch(distance){
 		case 1:
@@ -115,7 +115,7 @@ int main(int argc, char **argv){
 	for (i = 0; i < sg->nnodes; i++){
 		for (j = 0; j < sg->nnodes; j++){
 			Distances[i][j]/=max;
-			fwrite(&Distances[i][j], sizeof(double), 1, fp);
+			fwrite(&Distances[i][j], sizeof(float), 1, fp);
 		}
 	}
 

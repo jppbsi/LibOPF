@@ -83,7 +83,7 @@ void WriteSubgraph(Subgraph *g, char *file){
       fwrite(&g->node[i].position, sizeof(int), 1, fp);
       fwrite(&g->node[i].truelabel, sizeof(int), 1, fp);
       for (j = 0; j < g->nfeats; j++)
-	fwrite(&g->node[i].feat[j], sizeof(double), 1, fp);
+	fwrite(&g->node[i].feat[j], sizeof(float), 1, fp);
     }
     fclose(fp);
   }
@@ -112,14 +112,14 @@ Subgraph *ReadSubgraph(char *file){
     
   /*reading features*/
   for (i = 0; i < g->nnodes; i++){
-    g->node[i].feat = AllocDoubleArray(g->nfeats);
+    g->node[i].feat = AllocFloatArray(g->nfeats);
     if (fread(&g->node[i].position, sizeof(int), 1, fp) != 1) 
       Error("Could not read node position","ReadSubGraph");      
     if(fread(&g->node[i].truelabel, sizeof(int), 1, fp) != 1) 
       Error("Could not read node true label","ReadSubGraph");
 
     for (j = 0; j < g->nfeats; j++)
-      if(fread(&g->node[i].feat[j], sizeof(double), 1, fp) != 1) 
+      if(fread(&g->node[i].feat[j], sizeof(float), 1, fp) != 1) 
 	Error("Could not read node features","ReadSubGraph");	
    }
 
@@ -155,8 +155,8 @@ Subgraph *CopySubgraph(Subgraph *g){
 
 //Copy nodes
 void CopySNode(SNode *dest, SNode *src, int nfeats){
-	dest->feat = AllocDoubleArray(nfeats);
-	memcpy(dest->feat, src->feat, nfeats*sizeof(double));
+	dest->feat = AllocFloatArray(nfeats);
+	memcpy(dest->feat, src->feat, nfeats*sizeof(float));
 	dest->pathval = src->pathval;
 	dest->dens = src->dens;
 	dest->label  = src->label;

@@ -20,7 +20,7 @@ int main(int argc, char **argv){
 	char fileName[256];
 	FILE *f = NULL;
 	timer tic, toc;
-	double time;
+	float time;
 
 	if(argc == 3) opf_PrecomputedDistance = 1;
 

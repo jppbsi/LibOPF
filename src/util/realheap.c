@@ -102,7 +102,7 @@ char IsEmptyRealHeap(RealHeap *H) {
     return 0;
 }
 
-RealHeap *CreateRealHeap(int n, double *cost) {
+RealHeap *CreateRealHeap(int n, float *cost) {
   RealHeap *H = NULL;
   int i;
 
@@ -173,7 +173,7 @@ char RemoveRealHeap(RealHeap *H, int *pixel) {
 }
 
 
-void UpdateRealHeap(RealHeap *H, int p, double value){
+void UpdateRealHeap(RealHeap *H, int p, float value){
   H->cost[p] = value;
 
   if (H->color[p] == BLACK) {
