@@ -91,6 +91,7 @@ int main(int argc, char **argv){
     FILE *fp = NULL;
     char header[HEADERSIZE], line[LINESIZE], OK = 1;
     int nsamples, nlabels, nfeats, i;
+    char *result = NULL;
     
     fp = fopen(argv[1], "r");
     if(!fp){
@@ -99,7 +100,7 @@ int main(int argc, char **argv){
     }
     
     /* it checks the header */
-    fgets(header, HEADERSIZE, fp);
+    result = fgets(header, HEADERSIZE, fp);
     if(!CheckHeader(header, &nsamples, &nlabels, &nfeats)){
         fprintf(stderr,"\nAn error has been found at line 1 (HEADER).");
         fprintf(stderr,"\nThe header should contain only three integers:");
@@ -109,14 +110,14 @@ int main(int argc, char **argv){
     
     /* it checks the remaining file */
     for(i = 1; i <= nsamples; i++){
-        fgets(line, LINESIZE, fp);
+        result = fgets(line, LINESIZE, fp);
         if(!CheckLine(line, nlabels, nfeats, i)){
             fprintf(stderr,"\nAn error has been found at line %d\n", i+1);
             OK = 0; break;
         }
     }
-    
     fclose(fp);
+    if(result) result++;
     
     if (OK) fprintf(stderr,"\nThis file is in the proper format. Enjoy.\n");
     
