@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv){
 	fflush(stdout);
-	fprintf(stdout, "\nProgram that executes the training phase of the OPF classifier\n");
+	fprintf(stdout, "\nProgram that executes the training phase of the OPF classifier with knn adjacency\n");
 	fprintf(stdout, "\nIf you have any problem, please contact: ");
 	fprintf(stdout, "\n- alexandre.falcao@gmail.com");
 	fprintf(stdout, "\n- papa.joaopaulo@gmail.com\n");

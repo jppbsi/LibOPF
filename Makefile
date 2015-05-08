@@ -82,7 +82,7 @@ opfknn_train: libOPF
 	$(CC) $(FLAGS) $(INCFLAGS) src/opfknn_train.c  -L./lib -o bin/opfknn_train -lOPF -lm
 
 opfknn_classify: libOPF
-	$(CC) $(FLAGS) $(INCFLAGS) src/opf_knn_classify.c  -L./lib -o bin/opfknn_classify -lOPF -lm
+	$(CC) $(FLAGS) $(INCFLAGS) src/opfknn_classify.c  -L./lib -o bin/opfknn_classify -lOPF -lm
 
 util: $(SRC)/$(UTIL)/common.c $(SRC)/$(UTIL)/set.c $(SRC)/$(UTIL)/gqueue.c $(SRC)/$(UTIL)/realheap.c $(SRC)/$(UTIL)/sgctree.c $(SRC)/$(UTIL)/subgraph.c
 	$(CC) $(FLAGS) $(INCFLAGS) -c $(SRC)/$(UTIL)/common.c -o $(OBJ)/common.o

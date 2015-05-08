@@ -42,6 +42,7 @@ Subgraph *CreateSubgraph(int nnodes){
   for (i=0; i < sg->nnodes; i++){
     sg->node[i].feat   = NULL;
 	sg->node[i].relevant = 0;
+	sg->node[i].dens = 0.0;
   }
 
   return(sg);
