@@ -42,7 +42,7 @@ void opf_OPFTraining(Subgraph *sg){
   opf_MSTPrototypes(sg);
 
   // initialization
-  pathval = AllocFloatArray(sg->nnodes);
+  pathval = AllocDoubleArray(sg->nnodes);
 
   Q=CreateRealHeap(sg->nnodes, pathval);
 
@@ -158,7 +158,7 @@ Subgraph *opf_OPFSemiLearning(Subgraph *sg, Subgraph *nonsg, Subgraph *sgeval){
   merged = opf_MergeSubgraph(sg,nonsg);
   
   // initialization
-  pathval = AllocFloatArray(merged->nnodes);
+  pathval = AllocDoubleArray(merged->nnodes);
 
   Q=CreateRealHeap(merged->nnodes, pathval);
 
@@ -205,29 +205,6 @@ Subgraph *opf_OPFSemiLearning(Subgraph *sg, Subgraph *nonsg, Subgraph *sgeval){
   return merged;
 }
 
-
-// Classification function ----- it classifies nodes of sg by using
-// the OPF-clustering labels from sgtrain
-
-void opf_OPFKNNClassify(Subgraph *sgtrain, Subgraph *sg){
-  int   i, j, k;
-  double weight;
-
-  for (i = 0; i < sg->nnodes; i++){
-    for (j = 0; (j < sgtrain->nnodes); j++){
-      k = sgtrain->ordered_list_of_nodes[j];
-      if(!opf_PrecomputedDistance)
-	weight = opf_ArcWeight(sgtrain->node[k].feat,sg->node[i].feat,sg->nfeats);
-      else
-	weight = opf_DistanceValue[sgtrain->node[k].position][sg->node[i].position];
-      if (weight <= sgtrain->node[k].radius){
-	sg->node[i].label = sgtrain->node[k].label;
-	break;
-      }
-    }
-  }
-
-}
 
 //Learning function: it executes the learning procedure for CompGraph replacing the
 //missclassified samples in the evaluation set by non prototypes from
@@ -276,9 +253,11 @@ void opf_OPFAgglomerativeLearning(Subgraph **sgtrain, Subgraph **sgeval){
 
 void opf_OPFknnTraining(Subgraph *sg, int kmax){
   int bestk;
-  Subgraph *cpy = NULL;
   
   bestk = opf_OPFknnLearning(sg, sg, kmax);
+  opf_CreateArcs(sg, bestk);
+  opf_PDF(sg);
+  opf_OPFClustering4SupervisedLearning(sg);
 }
 
 int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
@@ -292,9 +271,10 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
     opf_CreateArcs(Train_cpy, k);
     opf_PDF(Train_cpy);
     opf_OPFClustering4SupervisedLearning(Train_cpy);
-    //classificar
-    //acuracia
     
+	opf_OPFknnClassify(Train_cpy, Eval_cpy);
+    Acc = opf_Accuracy(Eval_cpy);
+
     if(Acc > MaxAcc){
       MaxAcc = Acc;
       bestk = k;
@@ -302,8 +282,63 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
     
     opf_DestroyArcs(Train_cpy);
   }
+  DestroySubgraph(&Train_cpy);
+  DestroySubgraph(&Eval_cpy);
   
   return bestk;
+}
+
+// OPFknn Classification function 
+
+void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
+  int i, j, k, l, knn = Train->bestk, *nn = AllocIntArray(knn+1);
+  double weight, dist, *d = AllocDoubleArray(Train->bestk+1), tmp, cost;
+
+  for (i = 0; i < Test->nnodes; i++){
+	cost = DBL_MIN;
+	
+	/* it computes the k-nearest neighbours of test sample i */
+	for (l = 0; l < knn; l++){
+	  d[l] = DBL_MAX;
+	  
+	  for (j = 0; j < Train->nnodes; j++){
+		if (j != i){
+		  if (!opf_PrecomputedDistance) d[knn] = opf_ArcWeight(Test->node[i].feat,Train->node[j].feat,Train->nfeats);
+	      else d[knn] = opf_DistanceValue[Test->node[i].position][Train->node[j].position];
+	      nn[knn]= j;
+	      k = knn;
+	      while ((k > 0) && (d[k] < d[k-1])){
+			dist = d[k];
+			l = nn[k];
+			d[k] = d[k-1];
+			nn[k] = nn[k-1];
+			d[k-1] = dist;
+			nn[k-1] = l;
+			k--;
+          }
+        }
+      }
+	}
+
+    for (l = 0; l < knn; l++){
+      if (d[l] != INT_MAX) {
+		if (!opf_PrecomputedDistance) weight = opf_ArcWeight(Test->node[i].feat,Train->node[nn[l]].feat,Train->nfeats);
+	    else weight = opf_DistanceValue[Test->node[i].position][Train->node[nn[l]].position];
+		
+		tmp = MIN(weight, Train->node[nn[l]].dens);
+		if(tmp > cost){
+		  cost = tmp;
+		  Test->node[i].label = Train->node[nn[l]].truelabel;
+		}
+	  }
+    }
+    
+    free(d);
+    free(nn);
+  }
+  
+  opf_DestroyArcs(Test);
+  free(nn);
 }
 
 void opf_OPFClustering4SupervisedLearning(Subgraph *sg){
@@ -340,7 +375,7 @@ void opf_OPFClustering4SupervisedLearning(Subgraph *sg){
 
     // Compute clustering
 
-    pathval = AllocFloatArray(sg->nnodes);
+    pathval = AllocDoubleArray(sg->nnodes);
     Q = CreateRealHeap(sg->nnodes, pathval);
     SetRemovalPolicyRealHeap(Q, MAXVALUE);
 
@@ -418,7 +453,7 @@ void opf_OPFClustering(Subgraph *sg){
 
     // Compute clustering
 
-    pathval = AllocFloatArray(sg->nnodes);
+    pathval = AllocDoubleArray(sg->nnodes);
     Q = CreateRealHeap(sg->nnodes, pathval);
     SetRemovalPolicyRealHeap(Q, MAXVALUE);
 
@@ -526,7 +561,7 @@ void opf_RemoveIrrelevantNodes(Subgraph **sg){
     newsg = CreateSubgraph((*sg)->nnodes - num_of_irrelevants);
     newsg->nfeats = (*sg)->nfeats;
 //    for (i=0; i < newsg->nnodes; i++)
-//      newsg->node[i].feat = AllocFloatArray(newsg->nfeats);
+//      newsg->node[i].feat = AllocDoubleArray(newsg->nfeats);
 
     k=0;
     newsg->nlabels = (*sg)->nlabels;
@@ -560,10 +595,10 @@ void opf_MoveIrrelevantNodes(Subgraph **src, Subgraph **dst){
     newsrc->nlabels = (*src)->nlabels; newdst->nlabels = (*dst)->nlabels;
 
 //    for (i=0; i < newsrc->nnodes; i++)
-//      newsrc->node[i].feat = AllocFloatArray(newsrc->nfeats);
+//      newsrc->node[i].feat = AllocDoubleArray(newsrc->nfeats);
 
 //    for (i=0; i < newdst->nnodes; i++)
-//      newdst->node[i].feat = AllocFloatArray(newdst->nfeats);
+//      newdst->node[i].feat = AllocDoubleArray(newdst->nfeats);
 
     for (i = 0; i < (*dst)->nnodes; i++)
       CopySNode(&(newdst->node[i]), &((*dst)->node[i]), newdst->nfeats);
@@ -764,7 +799,7 @@ void opf_MSTPrototypes(Subgraph *sg){
   double nproto;
 
   // initialization
-  pathval = AllocFloatArray(sg->nnodes);
+  pathval = AllocDoubleArray(sg->nnodes);
   Q = CreateRealHeap(sg->nnodes, pathval);
 
   for (p = 0; p < sg->nnodes; p++) {
@@ -1029,9 +1064,9 @@ void opf_SplitSubgraph(Subgraph *sg, Subgraph **sg1, Subgraph **sg2, double perc
   (*sg2)->nfeats = sg->nfeats;
 
   for (i1=0; i1 < (*sg1)->nnodes; i1++)
-    (*sg1)->node[i1].feat = AllocFloatArray((*sg1)->nfeats);
+    (*sg1)->node[i1].feat = AllocDoubleArray((*sg1)->nfeats);
   for (i2=0; i2 < (*sg2)->nnodes; i2++)
-    (*sg2)->node[i2].feat = AllocFloatArray((*sg2)->nfeats);
+    (*sg2)->node[i2].feat = AllocDoubleArray((*sg2)->nfeats);
 
   (*sg1)->nlabels = sg->nlabels;
   (*sg2)->nlabels = sg->nlabels;
@@ -1190,8 +1225,8 @@ double opf_NormalizedCut( Subgraph *sg ){
     double *acumEC; //acumulate weights between the class and a distinct one
 
     ncut = 0.0;
-    acumIC = AllocFloatArray( sg->nlabels );
-    acumEC = AllocFloatArray( sg->nlabels );
+    acumIC = AllocDoubleArray( sg->nlabels );
+    acumEC = AllocDoubleArray( sg->nlabels );
 
     for ( p = 0; p < sg->nnodes; p++ )
     {
@@ -1268,7 +1303,7 @@ void opf_CreateArcs(Subgraph *sg, int knn){
     int    i,j,l,k;
     double  dist;
     int   *nn=AllocIntArray(knn+1);
-    double *d=AllocFloatArray(knn+1);
+    double *d=AllocDoubleArray(knn+1);
 
     /* Create graph with the knn-nearest neighbors */
 
@@ -1334,7 +1369,7 @@ void opf_DestroyArcs(Subgraph *sg){
 void opf_PDF(Subgraph *sg){
     int     i,nelems;
     double  dist;
-    double  *value=AllocFloatArray(sg->nnodes);
+    double  *value=AllocDoubleArray(sg->nnodes);
     Set    *adj=NULL;
 
     sg->K    = (2.0*(double)sg->df/9.0);
@@ -1549,8 +1584,8 @@ double* opf_CreateArcs2(Subgraph *sg, int kmax)
     int    i,j,l,k;
     double  dist;
     int   *nn=AllocIntArray(kmax+1);
-    double *d=AllocFloatArray(kmax+1);
-    double *maxdists=AllocFloatArray(kmax);
+    double *d=AllocDoubleArray(kmax+1);
+    double *maxdists=AllocDoubleArray(kmax);
     /* Create graph with the knn-nearest neighbors */
 
     sg->df=0.0;
@@ -1658,7 +1693,7 @@ void opf_OPFClusteringToKmax(Subgraph *sg)
 
     // Compute clustering
 
-    pathval = AllocFloatArray(sg->nnodes);
+    pathval = AllocDoubleArray(sg->nnodes);
     Q = CreateRealHeap(sg->nnodes, pathval);
     SetRemovalPolicyRealHeap(Q, MAXVALUE);
 
@@ -1716,7 +1751,7 @@ void opf_PDFtoKmax(Subgraph *sg)
     int     i,nelems;
     const int kmax = sg->bestk;
     double  dist;
-    double  *value=AllocFloatArray(sg->nnodes);
+    double  *value=AllocDoubleArray(sg->nnodes);
     Set    *adj=NULL;
 
     sg->K    = (2.0*(double)sg->df/9.0);
@@ -1782,8 +1817,8 @@ double opf_NormalizedCutToKmax( Subgraph *sg )
     double *acumEC; //acumulate weights between the class and a distinct one
 
     ncut = 0.0;
-    acumIC = AllocFloatArray( sg->nlabels );
-    acumEC = AllocFloatArray( sg->nlabels );
+    acumIC = AllocDoubleArray( sg->nlabels );
+    acumEC = AllocDoubleArray( sg->nlabels );
 
     for ( p = 0; p < sg->nnodes; p++ )
     {

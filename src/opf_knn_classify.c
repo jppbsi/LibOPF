@@ -32,7 +32,7 @@ int main(int argc, char **argv){
 
 	fprintf(stdout, "\nClassifying test set ..."); fflush(stdout);
 	gettimeofday(&tic,NULL);
-	opf_OPFKNNClassify(gTrain, gTest); gettimeofday(&toc,NULL);
+	opf_OPFknnClassify(gTrain, gTest); gettimeofday(&toc,NULL);
 	fprintf(stdout, " OK"); fflush(stdout);
 
 	fprintf(stdout, "\nWriting output file ..."); fflush(stdout);

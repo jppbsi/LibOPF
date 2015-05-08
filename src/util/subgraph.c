@@ -112,7 +112,7 @@ Subgraph *ReadSubgraph(char *file){
     
   /*reading features*/
   for (i = 0; i < g->nnodes; i++){
-    g->node[i].feat = AllocFloatArray(g->nfeats);
+    g->node[i].feat = AllocDoubleArray(g->nfeats);
     if (fread(&g->node[i].position, sizeof(int), 1, fp) != 1) 
       Error("Could not read node position","ReadSubGraph");      
     if(fread(&g->node[i].truelabel, sizeof(int), 1, fp) != 1) 
@@ -155,7 +155,7 @@ Subgraph *CopySubgraph(Subgraph *g){
 
 //Copy nodes
 void CopySNode(SNode *dest, SNode *src, int nfeats){
-	dest->feat = AllocFloatArray(nfeats);
+	dest->feat = AllocDoubleArray(nfeats);
 	memcpy(dest->feat, src->feat, nfeats*sizeof(double));
 	dest->pathval = src->pathval;
 	dest->dens = src->dens;

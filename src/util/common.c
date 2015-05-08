@@ -34,7 +34,7 @@ int *AllocIntArray(int n)
   return(v);
 }
 
-double *AllocFloatArray(int n)
+double *AllocDoubleArray(int n)
 {
   double *v=NULL;
   v = (double *) calloc(n,sizeof(double));

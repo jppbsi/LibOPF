@@ -41,7 +41,7 @@ typedef struct timeval timer;
 #endif
 
 int    *AllocIntArray(int n);   /* It allocates 1D array of n integers */
-double  *AllocFloatArray(int n); /* It allocates 1D array of n doubles */
+double  *AllocDoubleArray(int n); /* It allocates 1D array of n doubles */
 
 void Error(char *msg,char *func); /* It prints error message and exits
                                      the program. */
