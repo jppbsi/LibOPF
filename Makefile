@@ -11,7 +11,7 @@ FLAGS=  -O3 -Wall
 
 INCFLAGS = -I$(INCLUDE) -I$(INCLUDE)/$(UTIL)
 
-all: libOPF opf_split opf_accuracy opf_train opf_classify opf_learn opf_distance opf_info opf_fold opf_merge opf_cluster opf_knn_classify statistics txt2opf opf2txt opf_check opf_normalize
+all: libOPF opf_split opf_accuracy opf_train opf_classify opf_learn opf_distance opf_info opf_fold opf_merge opf_cluster statistics txt2opf opf2txt opf_check opf_normalize opfknn_train opfknn_classify
 
 libOPF: libOPF-build
 	echo "libOPF.a built..."
@@ -63,9 +63,6 @@ opf_merge: libOPF
 opf_cluster: libOPF
 	$(CC) $(FLAGS) $(INCFLAGS) src/opf_cluster.c  -L./lib -o bin/opf_cluster -lOPF -lm
 	
-opf_knn_classify: libOPF
-	$(CC) $(FLAGS) $(INCFLAGS) src/opf_knn_classify.c  -L./lib -o bin/opf_knn_classify -lOPF -lm
-
 statistics:
 	$(CC) $(FLAGS) tools/src/statistics.c  -o tools/statistics -lm
 
@@ -80,7 +77,12 @@ opf2txt: libOPF
 
 opf_normalize: libOPF
 	$(CC) $(FLAGS) $(INCFLAGS) src/opf_normalize.c  -L./lib -o bin/opf_normalize -lOPF -lm
+	
+opfknn_train: libOPF
+	$(CC) $(FLAGS) $(INCFLAGS) src/opfknn_train.c  -L./lib -o bin/opfknn_train -lOPF -lm
 
+opfknn_classify: libOPF
+	$(CC) $(FLAGS) $(INCFLAGS) src/opf_knn_classify.c  -L./lib -o bin/opfknn_classify -lOPF -lm
 
 util: $(SRC)/$(UTIL)/common.c $(SRC)/$(UTIL)/set.c $(SRC)/$(UTIL)/gqueue.c $(SRC)/$(UTIL)/realheap.c $(SRC)/$(UTIL)/sgctree.c $(SRC)/$(UTIL)/subgraph.c
 	$(CC) $(FLAGS) $(INCFLAGS) -c $(SRC)/$(UTIL)/common.c -o $(OBJ)/common.o
@@ -111,7 +113,7 @@ OPF-ift.o: $(SRC)/OPF.c
 ## Cleaning-up
 
 clean:
-	rm -f $(LIB)/lib*.a; rm -f $(OBJ)/*.o bin/opf_split bin/opf_accuracy bin/opf_train bin/opf_classify bin/opf_learn bin/opf_distance bin/opf_info bin/opf_cluster bin/opf_fold bin/opf_merge tools/opf_check bin/opf_knn_classify tools/statistics tools/txt2opf tools/opf2txt tools/opf_check bin/opf_normalize
+	rm -f $(LIB)/lib*.a; rm -f $(OBJ)/*.o bin/* tools/opf_check tools/statistics tools/txt2opf tools/opf2txt tools/opf_check
 
 clean_results:
 	rm -f *.out *.opf *.acc *.time *.opf training.dat evaluating.dat testing.dat

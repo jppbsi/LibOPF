@@ -13,39 +13,39 @@ int main(int argc, char **argv){
 	FILE *fpIn = NULL,*fpOut = NULL;
 	int n, ndata, nclasses, label, i,j, id;
 	float aux;
+	size_t result = 0;
 
 	fpIn = fopen(argv[1],"rb");
 	fpOut = fopen(argv[2],"w");
 
 	/*gravando numero de objetos*/
-	fread(&n,sizeof(int),1,fpIn);
+	result = fread(&n,sizeof(int),1,fpIn);
     fprintf(fpOut,"%d ",n);
 
 	/*gravando numero de classes*/
-	fread(&nclasses,sizeof(int),1,fpIn);
+	result = fread(&nclasses,sizeof(int),1,fpIn);
     fprintf(fpOut,"%d ",nclasses);
 
 	/*gravando tamanho vetor de caracteristicas*/
-	fread(&ndata,sizeof(int),1,fpIn);
+	result = fread(&ndata,sizeof(int),1,fpIn);
 	fprintf(fpOut,"%d ",ndata);
 
 	fprintf(fpOut,"\n");
 	/*gravando vetor de caracteristicas*/
 	for(i = 0; i < n; i++){
-		fread(&id,sizeof(int),1,fpIn);
-		fread(&label,sizeof(int),1,fpIn);
+		result = fread(&id,sizeof(int),1,fpIn);
+		result = fread(&label,sizeof(int),1,fpIn);
 		fprintf(fpOut,"%d %d ",id,label);
-		for(j = 0; j < ndata; j++)
-		{
-			fread(&aux,sizeof(float),1,fpIn);
+		for(j = 0; j < ndata; j++){
+			result = fread(&aux,sizeof(float),1,fpIn);
 			fprintf(fpOut,"%f ",aux);
 		}
 		fprintf(fpOut,"\n");
 	}
 
-
 	fclose(fpIn);
 	fclose(fpOut);
+	result++;
 
 	return 0;
 }

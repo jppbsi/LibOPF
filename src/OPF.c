@@ -53,7 +53,7 @@ void opf_OPFTraining(Subgraph *sg){
       sg->node[p].label  = sg->node[p].truelabel;
       InsertRealHeap(Q, p);
     }else{ // non-prototypes
-      pathval[p]  = DBL_MAX;
+      pathval[p]  = FLT_MAX;
     }
   }
 
@@ -169,7 +169,7 @@ Subgraph *opf_OPFSemiLearning(Subgraph *sg, Subgraph *nonsg, Subgraph *sgeval){
       merged->node[p].label  = merged->node[p].truelabel;
       InsertRealHeap(Q, p);
     }else{ // non-prototypes
-      pathval[p]  = DBL_MAX;
+      pathval[p]  = FLT_MAX;
     }
   }
   // IFT with fmax
@@ -211,7 +211,7 @@ Subgraph *opf_OPFSemiLearning(Subgraph *sg, Subgraph *nonsg, Subgraph *sgeval){
 //training set -----
 void opf_OPFLearning(Subgraph **sgtrain, Subgraph **sgeval){
 	int i = 0, iterations = 10;
-	float Acc = DBL_MIN, AccAnt = DBL_MIN,MaxAcc=DBL_MIN, delta;
+	float Acc = FLT_MIN, AccAnt = FLT_MIN,MaxAcc=FLT_MIN, delta;
 	Subgraph *sg=NULL;
 
 	do{
@@ -262,10 +262,11 @@ void opf_OPFknnTraining(Subgraph *sg, int kmax){
 
 int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
   int k, bestk = 1;
-  float MaxAcc = DBL_MIN, Acc = 0.0;
+  float MaxAcc = FLT_MIN, Acc = 0.0;
   Subgraph *Train_cpy = CopySubgraph(Train), *Eval_cpy = CopySubgraph(Eval);
   
   for(k = 1; k <= kmax; k++){
+	fprintf(stderr,"\nEvaluating k = %d ... ", k);
     Train_cpy->bestk = k;
     
     opf_CreateArcs(Train_cpy, k);
@@ -274,6 +275,7 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
     
 	opf_OPFknnClassify(Train_cpy, Eval_cpy);
     Acc = opf_Accuracy(Eval_cpy);
+	fprintf(stderr," %.2f%%", Acc*100);
 
     if(Acc > MaxAcc){
       MaxAcc = Acc;
@@ -284,6 +286,7 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
   }
   DestroySubgraph(&Train_cpy);
   DestroySubgraph(&Eval_cpy);
+  fprintf(stderr,"\n	-> best k: %d", bestk);
   
   return bestk;
 }
@@ -295,11 +298,11 @@ void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
   float weight, dist, *d = AllocFloatArray(Train->bestk+1), tmp, cost;
 
   for (i = 0; i < Test->nnodes; i++){
-	cost = DBL_MIN;
+	cost = FLT_MIN;
 	
 	/* it computes the k-nearest neighbours of test sample i */
 	for (l = 0; l < knn; l++){
-	  d[l] = DBL_MAX;
+	  d[l] = FLT_MAX;
 	  
 	  for (j = 0; j < Train->nnodes; j++){
 		if (j != i){
@@ -331,13 +334,11 @@ void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
 		  Test->node[i].label = Train->node[nn[l]].truelabel;
 		}
 	  }
-    }
-    
-    free(d);
-    free(nn);
+    }  
   }
   
   opf_DestroyArcs(Test);
+  free(d);
   free(nn);
 }
 
@@ -661,36 +662,34 @@ void opf_WriteModelFile(Subgraph *g, char *file){
 
   fp = fopen(file, "wb");
   fwrite(&g->nnodes, sizeof(int), 1, fp);
-   fwrite(&g->nlabels, sizeof(int), 1, fp);
-   fwrite(&g->nfeats, sizeof(int), 1, fp);
+  fwrite(&g->nlabels, sizeof(int), 1, fp);
+  fwrite(&g->nfeats, sizeof(int), 1, fp);
 
   /*writing df*/
-   fwrite(&g->df, sizeof(float), 1, fp);
+  fwrite(&g->df, sizeof(float), 1, fp);
 
-  // for supervised opf based on pdf
-
-   fwrite(&g->K, sizeof(float), 1, fp);
-   fwrite(&g->mindens, sizeof(float), 1, fp);
-   fwrite(&g->maxdens, sizeof(float), 1, fp);
+  /* for supervised opf based on pdf */
+  fwrite(&g->bestk, sizeof(int), 1, fp);
+  fwrite(&g->K, sizeof(float), 1, fp);
+  fwrite(&g->mindens, sizeof(float), 1, fp);
+  fwrite(&g->maxdens, sizeof(float), 1, fp);
 
   /*writing position(id), label, pred, pathval and features*/
   for (i = 0; i < g->nnodes; i++){
-     fwrite(&g->node[i].position, sizeof(int), 1, fp);
-     fwrite(&g->node[i].truelabel, sizeof(int), 1, fp);
-     fwrite(&g->node[i].pred, sizeof(int), 1, fp);
-     fwrite(&g->node[i].label, sizeof(int), 1, fp);
-     fwrite(&g->node[i].pathval, sizeof(float), 1, fp);
-     fwrite(&g->node[i].radius, sizeof(float), 1, fp);
+    fwrite(&g->node[i].position, sizeof(int), 1, fp);
+    fwrite(&g->node[i].truelabel, sizeof(int), 1, fp);
+    fwrite(&g->node[i].pred, sizeof(int), 1, fp);
+    fwrite(&g->node[i].label, sizeof(int), 1, fp);
+    fwrite(&g->node[i].pathval, sizeof(float), 1, fp);
+    fwrite(&g->node[i].radius, sizeof(float), 1, fp);
 
-    for (j = 0; j < g->nfeats; j++){
-       fwrite(&g->node[i].feat[j], sizeof(float), 1, fp);
-    }
+	for (j = 0; j < g->nfeats; j++)
+	  fwrite(&g->node[i].feat[j], sizeof(float), 1, fp);
   }
 
-  for (i = 0; i < g->nnodes; i++){
-     fwrite(&g->ordered_list_of_nodes[i], sizeof(int), 1, fp);
-  }
-
+  for (i = 0; i < g->nnodes; i++)
+    fwrite(&g->ordered_list_of_nodes[i], sizeof(int), 1, fp);
+  
   fclose(fp);
 }
 
@@ -724,9 +723,11 @@ Subgraph *opf_ReadModelFile(char *file){
 
 
   // for supervised opf by pdf
-
+  if (fread(&g->bestk, sizeof(int), 1, fp) != 1)
+	Error("Could not read the best k","opf_ReadModelFile");
+	
   if (fread(&g->K, sizeof(float), 1, fp) != 1) 
-    Error("Could not read the best K","opf_ReadModelFile");
+    Error("Could not read K","opf_ReadModelFile");
     
   if (fread(&g->mindens, sizeof(float), 1, fp) != 1) 
     Error("Could not read minimum density","opf_ReadModelFile");
@@ -803,7 +804,7 @@ void opf_MSTPrototypes(Subgraph *sg){
   Q = CreateRealHeap(sg->nnodes, pathval);
 
   for (p = 0; p < sg->nnodes; p++) {
-    pathval[ p ] = DBL_MAX;
+    pathval[ p ] = FLT_MAX;
     sg->node[p].status=0;
   }
 
@@ -1264,7 +1265,7 @@ float opf_NormalizedCut( Subgraph *sg ){
 void opf_BestkMinCut(Subgraph *sg, int kmin, int kmax)
 {
     int k, bestk = kmax;
-    float mincut=DBL_MAX,nc;
+    float mincut=FLT_MAX,nc;
 
     float* maxdists = opf_CreateArcs2(sg,kmax); // stores the maximum distances for every k=1,2,...,kmax
 
@@ -1311,7 +1312,7 @@ void opf_CreateArcs(Subgraph *sg, int knn){
     for (i=0; i < sg->nnodes; i++)
     {
         for (l=0; l < knn; l++)
-            d[l]=DBL_MAX;
+            d[l]=FLT_MAX;
         for (j=0; j < sg->nnodes; j++)
         {
             if (j!=i)
@@ -1373,8 +1374,8 @@ void opf_PDF(Subgraph *sg){
     Set    *adj=NULL;
 
     sg->K    = (2.0*(float)sg->df/9.0);
-    sg->mindens = DBL_MAX;
-    sg->maxdens = DBL_MIN;
+    sg->mindens = FLT_MAX;
+    sg->maxdens = FLT_MIN;
     for (i=0; i < sg->nnodes; i++)
     {
         adj=sg->node[i].adj;
@@ -1592,7 +1593,7 @@ float* opf_CreateArcs2(Subgraph *sg, int kmax)
     for (i=0; i < sg->nnodes; i++)
     {
         for (l=0; l < kmax; l++)
-            d[l]=DBL_MAX;
+            d[l]=FLT_MAX;
         for (j=0; j < sg->nnodes; j++)
         {
             if (j!=i)
@@ -1620,7 +1621,7 @@ float* opf_CreateArcs2(Subgraph *sg, int kmax)
         //making sure that the adjacent nodes be sorted in non-decreasing order
         for (l=kmax-1; l >= 0; l--)
         {
-            if (d[l]!=DBL_MAX)
+            if (d[l]!=FLT_MAX)
             {
                 if (d[l] > sg->df)
                     sg->df = d[l];
@@ -1756,8 +1757,8 @@ void opf_PDFtoKmax(Subgraph *sg)
 
     sg->K    = (2.0*(float)sg->df/9.0);
 
-    sg->mindens = DBL_MAX;
-    sg->maxdens = DBL_MIN;
+    sg->mindens = FLT_MAX;
+    sg->maxdens = FLT_MIN;
     for (i=0; i < sg->nnodes; i++)
     {
         adj=sg->node[i].adj;
