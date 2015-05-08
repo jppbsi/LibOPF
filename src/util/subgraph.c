@@ -38,6 +38,8 @@ Subgraph *CreateSubgraph(int nnodes){
   if (sg->node == NULL){
     Error("Cannot allocate nodes","CreateSubgraph");
   }
+  
+  sg->bestk = 0;
 
   for (i=0; i < sg->nnodes; i++){
     sg->node[i].feat   = NULL;

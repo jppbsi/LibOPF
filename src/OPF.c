@@ -251,11 +251,9 @@ void opf_OPFAgglomerativeLearning(Subgraph **sgtrain, Subgraph **sgeval){
     }while(n);
 }
 
-void opf_OPFknnTraining(Subgraph *sg, int kmax){
-  int bestk;
-  
-  bestk = opf_OPFknnLearning(sg, sg, kmax);
-  opf_CreateArcs(sg, bestk);
+void opf_OPFknnTraining(Subgraph *sg, int kmax){  
+  sg->bestk = opf_OPFknnLearning(sg, sg, kmax);
+  opf_CreateArcs(sg, sg->bestk);
   opf_PDF(sg);
   opf_OPFClustering4SupervisedLearning(sg);
 }
@@ -284,6 +282,7 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
     
     opf_DestroyArcs(Train_cpy);
   }
+
   DestroySubgraph(&Train_cpy);
   DestroySubgraph(&Eval_cpy);
   fprintf(stderr,"\n	-> best k: %d", bestk);
@@ -295,7 +294,7 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
 void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
   int i, j, k, l, knn = Train->bestk, *nn = AllocIntArray(knn+1);
   float weight, dist, *d = AllocFloatArray(Train->bestk+1), tmp, cost;
-
+		  
   for (i = 0; i < Test->nnodes; i++){
 	cost = FLT_MIN;
 	
@@ -336,7 +335,6 @@ void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
     }  
   }
   
-  opf_DestroyArcs(Test);
   free(d);
   free(nn);
 }

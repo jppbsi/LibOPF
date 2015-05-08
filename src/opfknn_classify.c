@@ -31,8 +31,7 @@ int main(int argc, char **argv){
 		opf_DistanceValue = opf_ReadDistances(argv[2], &n);
 
 	fprintf(stdout, "\nClassifying test set ..."); fflush(stdout);
-	gettimeofday(&tic,NULL);
-	opf_OPFknnClassify(gTrain, gTest); gettimeofday(&toc,NULL);
+	gettimeofday(&tic,NULL); opf_OPFknnClassify(gTrain, gTest); gettimeofday(&toc,NULL);
 	fprintf(stdout, " OK"); fflush(stdout);
 
 	fprintf(stdout, "\nWriting output file ..."); fflush(stdout);
