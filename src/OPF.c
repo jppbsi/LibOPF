@@ -211,7 +211,7 @@ Subgraph *opf_OPFSemiLearning(Subgraph *sg, Subgraph *nonsg, Subgraph *sgeval){
 //training set -----
 void opf_OPFLearning(Subgraph **sgtrain, Subgraph **sgeval){
 	int i = 0, iterations = 10;
-	float Acc = FLT_MIN, AccAnt = FLT_MIN,MaxAcc=FLT_MIN, delta;
+	float Acc = -FLT_MAX, AccAnt = -FLT_MAX,MaxAcc=-FLT_MAX, delta;
 	Subgraph *sg=NULL;
 
 	do{
@@ -260,7 +260,7 @@ void opf_OPFknnTraining(Subgraph *sg, int kmax){
 
 int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
   int k, bestk = 1;
-  float MaxAcc = FLT_MIN, Acc = 0.0;
+  float MaxAcc = -FLT_MAX, Acc = 0.0;
   Subgraph *Train_cpy = CopySubgraph(Train), *Eval_cpy = CopySubgraph(Eval);
   
   for(k = 1; k <= kmax; k++){
@@ -296,7 +296,7 @@ void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
   float weight, dist, *d = AllocFloatArray(Train->bestk+1), tmp, cost;
 		  
   for (i = 0; i < Test->nnodes; i++){
-	cost = FLT_MIN;
+	cost = -FLT_MAX;
 	
 	/* it computes the k-nearest neighbours of test sample i */
 	for (l = 0; l < knn; l++){
@@ -1348,7 +1348,7 @@ void opf_PDF(Subgraph *sg){
 
     sg->K    = (2.0*(float)sg->df/9.0);
     sg->mindens = FLT_MAX;
-    sg->maxdens = FLT_MIN;
+    sg->maxdens = -FLT_MAX;
     for (i=0; i < sg->nnodes; i++)
     {
         adj=sg->node[i].adj;
@@ -1731,7 +1731,7 @@ void opf_PDFtoKmax(Subgraph *sg)
     sg->K    = (2.0*(float)sg->df/9.0);
 
     sg->mindens = FLT_MAX;
-    sg->maxdens = FLT_MIN;
+    sg->maxdens = -FLT_MAX;
     for (i=0; i < sg->nnodes; i++)
     {
         adj=sg->node[i].adj;
