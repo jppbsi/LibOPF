@@ -28,7 +28,7 @@ int main(int argc, char **argv){
 	Subgraph *sg = ReadSubgraph(argv[1]);
 	FILE *fp = fopen("distances.dat", "wb");
 	int i, j, distance = atoi(argv[2]), normalize = atoi(argv[3]);
-	float **Distances = NULL, max = FLT_MIN;
+	float **Distances = NULL, max = -FLT_MAX;
 
 	fwrite(&sg->nnodes, sizeof(int), 1, fp);
 
