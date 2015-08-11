@@ -47,8 +47,7 @@ int main(int argc, char **argv){
 	printf("\n number of features: %d",ndata);
 	fwrite(&ndata,sizeof(int),1,fpOut);
 	
-	/*writting data*/
-
+	/*writing data*/
 	for(i = 0; i < n; i++)	{
 	  if (fscanf(fpIn,"%d",&id) != 1) {
 	    fprintf(stderr,"Could not read sample id");
