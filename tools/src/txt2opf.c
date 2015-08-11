@@ -15,7 +15,7 @@ int main(int argc, char **argv){
 	fprintf(stderr, "\nProgram to convert files written in the OPF ASCII format to the OPF binary format.");
 
 	FILE *fpIn = NULL,*fpOut = NULL;
-	int n, ndata, nclasses, i,j, id,label;
+	int n, nfeats, nclasses, i,j, id,label;
 	float aux;
 
 	fpIn = fopen(argv[1],"r");
@@ -39,13 +39,13 @@ int main(int argc, char **argv){
 	fwrite(&nclasses,sizeof(int),1,fpOut);
 
 	/*writing the number of features*/
-	if (fscanf(fpIn,"%d",&ndata) != 1) {
+	if (fscanf(fpIn,"%d",&nfeats) != 1) {
 	  fprintf(stderr,"Could not read number of features");
 	  exit(-1);
 	}
 
-	printf("\n number of features: %d",ndata);
-	fwrite(&ndata,sizeof(int),1,fpOut);
+	printf("\n number of features: %d",nfeats);
+	fwrite(&nfeats,sizeof(int),1,fpOut);
 	
 	/*writing data*/
 	for(i = 0; i < n; i++)	{
