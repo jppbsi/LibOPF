@@ -26,7 +26,7 @@ int main(int argc, char **argv){
 	  fprintf(stderr,"Could not read number of samples");
 	  exit(-1);
 	}
-	printf("\n number of samples: %d",n);
+	fprintf(stderr, "\n number of samples: %d",n);
 	fwrite(&n,sizeof(int),1,fpOut);
 
 	/*writing the number of classes*/
@@ -35,7 +35,7 @@ int main(int argc, char **argv){
 	  exit(-1);
 	}
 
- 	printf("\n number of classes: %d",nclasses); 
+ 	fprintf(stderr, "\n number of classes: %d",nclasses); 
 	fwrite(&nclasses,sizeof(int),1,fpOut);
 
 	/*writing the number of features*/
@@ -44,7 +44,7 @@ int main(int argc, char **argv){
 	  exit(-1);
 	}
 
-	printf("\n number of features: %d",nfeats);
+	fprintf(stderr, "\n number of features: %d",nfeats);
 	fwrite(&nfeats,sizeof(int),1,fpOut);
 	
 	/*writing data*/
