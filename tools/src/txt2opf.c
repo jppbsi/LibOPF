@@ -61,7 +61,7 @@ int main(int argc, char **argv){
 	  }
 	  fwrite(&label,sizeof(int),1,fpOut);
 	  
-	  for(j = 0; j < ndata; j++){
+	  for(j = 0; j < nfeats; j++){
 	    if (fscanf(fpIn,"%f",&aux) != 1) {
 	      fprintf(stderr,"Could not read sample features");
 	      exit(-1);
