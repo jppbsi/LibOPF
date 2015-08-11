@@ -21,7 +21,7 @@ int main(int argc, char **argv){
 	fpIn = fopen(argv[1],"r");
 	fpOut = fopen(argv[2],"wb");
 
-	/*writting the number of samples*/
+	/*writing the number of samples*/
 	if (fscanf(fpIn,"%d",&n) != 1) {
 	  fprintf(stderr,"Could not read number of samples");
 	  exit(-1);
@@ -29,7 +29,7 @@ int main(int argc, char **argv){
 	printf("\n number of samples: %d",n);
 	fwrite(&n,sizeof(int),1,fpOut);
 
-	/*writting the number of classes*/
+	/*writing the number of classes*/
 	if (fscanf(fpIn,"%d",&nclasses) != 1) {
 	  fprintf(stderr,"Could not read number of classes");
 	  exit(-1);
@@ -38,7 +38,7 @@ int main(int argc, char **argv){
  	printf("\n number of classes: %d",nclasses); 
 	fwrite(&nclasses,sizeof(int),1,fpOut);
 
-	/*writting the number of features*/
+	/*writing the number of features*/
 	if (fscanf(fpIn,"%d",&ndata) != 1) {
 	  fprintf(stderr,"Could not read number of features");
 	  exit(-1);
