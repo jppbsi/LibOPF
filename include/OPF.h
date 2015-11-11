@@ -34,13 +34,13 @@ extern char	opf_PrecomputedDistance;
 extern float  **opf_DistanceValue;
 
 /*--------- Supervised OPF with complete graph -----------------------*/
-void opf_OPFTraining(Subgraph *sg); //Training function
+void opf_OPFTraining(Subgraph *Train); //Training function
 void opf_OPFClassifying(Subgraph *sgtrain, Subgraph *sg); //Classification function: it simply classifies samples from sg
 void opf_OPFLearning(Subgraph **sgtrain, Subgraph **sgeval); //Learning function
 void opf_OPFAgglomerativeLearning(Subgraph **sgtrain, Subgraph **sgeval); //Agglomerative learning function
 
 /*--------- Supervised OPF with knn graph -----------------------*/
-void opf_OPFknnTraining(Subgraph *sg, int kmax); //Training function
+void opf_OPFknnTraining(Subgraph *Train, Subgraph *Eval, int kmax); //Training function
 int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax); //It learns the best k value, i.e., the ones that maximizes the accuracy over a validation set
 void opf_OPFClustering4SupervisedLearning(Subgraph *sg); //it executes the OPF clustering algorithm using the labeled samples
 void  opf_OPFknnClassify(Subgraph *Train, Subgraph *Test); // OPFknn classification function

@@ -251,12 +251,12 @@ void opf_OPFAgglomerativeLearning(Subgraph **sgtrain, Subgraph **sgeval){
     }while(n);
 }
 
-void opf_OPFknnTraining(Subgraph *sg, int kmax){  
-  sg->bestk = opf_OPFknnLearning(sg, sg, kmax);
-  opf_CreateArcs(sg, sg->bestk);
-  opf_PDF(sg);
-  opf_OPFClustering4SupervisedLearning(sg);
-  opf_DestroyArcs(sg);
+void opf_OPFknnTraining(Subgraph *Train, Subgraph *Eval, int kmax){  
+  Train->bestk = opf_OPFknnLearning(Train, Eval, kmax);
+  opf_CreateArcs(Train, Train->bestk);
+  opf_PDF(Train);
+  opf_OPFClustering4SupervisedLearning(Train);
+  opf_DestroyArcs(Train);
 }
 
 int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){

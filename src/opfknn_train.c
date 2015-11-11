@@ -9,47 +9,50 @@ int main(int argc, char **argv){
 	fprintf(stdout, "\nLibOPF version 2.0 (2009)\n");
 	fprintf(stdout, "\n"); fflush(stdout);
 
-	if((argc != 4) && (argc != 3)){
+	if((argc != 5) && (argc != 4)){
 		fprintf(stderr, "\nusage opf_train <P1> <P2>");
 		fprintf(stderr, "\nP1: training set in the OPF file format");
-		fprintf(stderr, "\nP2: kmax");
-		fprintf(stderr, "\nP3: precomputed distance file (leave it in blank if you are not using this resource)\n");
+		fprintf(stderr, "\nP2: evaluating set in the OPF file format (used to learn k)");
+		fprintf(stderr, "\nP3: kmax");
+		fprintf(stderr, "\nP4: precomputed distance file (leave it in blank if you are not using this resource)\n");
 		exit(-1);
 	}
 
-	int n, i, kmax = atoi(argv[2]);
+	int n, i, kmax = atoi(argv[3]);
 	char fileName[256];
 	FILE *f = NULL;
 	timer tic, toc;
 	double time;
 
-	if(argc == 4) opf_PrecomputedDistance = 1;
+	if(argc == 5) opf_PrecomputedDistance = 1;
 
 	fprintf(stdout, "\nReading data file ..."); fflush(stdout);
-	Subgraph *g = ReadSubgraph(argv[1]);
+	Subgraph *Train = ReadSubgraph(argv[1]);
+	Subgraph *Eval = ReadSubgraph(argv[2]);
 	fprintf(stdout, " OK"); fflush(stdout);
 
 	if(opf_PrecomputedDistance)
-		opf_DistanceValue = opf_ReadDistances(argv[3], &n);
+		opf_DistanceValue = opf_ReadDistances(argv[4], &n);
 
 	fprintf(stdout, "\nTraining OPF classifier ..."); fflush(stdout);
-	gettimeofday(&tic,NULL); opf_OPFknnTraining(g, kmax); gettimeofday(&toc,NULL);
+	gettimeofday(&tic,NULL); opf_OPFknnTraining(Train, Eval, kmax); gettimeofday(&toc,NULL);
 	fprintf(stdout, " OK"); fflush(stdout);
 
 	fprintf(stdout, "\nWriting classifier's model file ..."); fflush(stdout);
-	opf_WriteModelFile(g, "classifier.opf");
+	opf_WriteModelFile(Train, "classifier.opf");
 	fprintf(stdout, " OK"); fflush(stdout);
 
 	fprintf(stdout, "\nWriting output file ..."); fflush(stdout);
 	sprintf(fileName,"%s.out",argv[1]);
 	f = fopen(fileName,"w");
-	for (i = 0; i < g->nnodes; i++)
-		fprintf(f,"%d\n",g->node[i].label);
+	for (i = 0; i < Train->nnodes; i++)
+		fprintf(f,"%d\n",Train->node[i].label);
 	fclose(f);
 	fprintf(stdout, " OK"); fflush(stdout);
 
 	fprintf(stdout, "\nDeallocating memory ..."); fflush(stdout);
-	DestroySubgraph(&g);
+	DestroySubgraph(&Train);
+	DestroySubgraph(&Eval);
 	if(opf_PrecomputedDistance){
 		for (i = 0; i < n; i++)
 			free(opf_DistanceValue[i]);
