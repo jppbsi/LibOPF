@@ -388,10 +388,11 @@ void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
 // OPFknn Classification function 
 void Myopf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
   int i, j, k, l, knn = Train->bestk, *nn = AllocIntArray(knn+1);
-  int max_pathval, max_index;
-  float weight, dist, *d = AllocFloatArray(Train->bestk+1), tmp, cost;
+  int max_index;
+  float weight, dist, *d = AllocFloatArray(Train->bestk+1), tmp, cost, dens, max_pathval;
 		  
   for (i = 0; i < Test->nnodes; i++){
+  //for (i = 0; i < 1; i++){
     cost = -FLT_MAX;
     
     /* it computes the k-nearest neighbours of test sample i */
@@ -416,26 +417,39 @@ void Myopf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
       }
     }
   
+    /* computing the density of testing sample i */
+    dens = 0;
+    for(l = 0; l < knn; l++){
+      if (!opf_PrecomputedDistance) weight = opf_ArcWeight(Test->node[i].feat,Train->node[nn[l]].feat,Train->nfeats);
+      else weight = opf_DistanceValue[Test->node[i].position][Train->node[nn[l]].position];
+      dens+=exp(-dist/Train->K);
+    }
+    dens/=knn;
+    
     max_pathval = -FLT_MAX;
     max_index = -1;
     
-    for (l = 1; l < knn; l++){
-      /*if (d[l] != INT_MAX){
-        if (!opf_PrecomputedDistance) weight = opf_ArcWeight(Test->node[i].feat,Train->node[nn[l]].feat,Train->nfeats);
-        else weight = opf_DistanceValue[Test->node[i].position][Train->node[nn[l]].position];
-		
-        tmp = MIN(weight, Train->node[nn[l]].dens);
+    for (l = 0; l < knn; l++){
+      if (d[l] != INT_MAX){
+        /*tmp = MIN(Train->node[nn[l]].pathval, dens);
+	fprintf(stderr,"\nNode: %d -> ", nn[l]);
+	fprintf(stderr,"\nMIN(%f,%f): %f\n",Train->node[nn[l]].pathval,dens, tmp);
+	
         if(tmp > cost){
 	  cost = tmp;
 	  Test->node[i].label = Train->node[nn[l]].truelabel;
+	  fprintf(stderr,"\nID of the conqueror: %d (label %d)", nn[l], Train->node[nn[l]].truelabel);
+	}*/
+      
+      
+	if(Train->node[nn[l]].pathval > max_pathval){
+	  max_pathval = Train->node[nn[l]].pathval;
+	  max_index = nn[l];
 	}
-      }*/
-      if(Train->node[nn[l]].pathval > max_pathval){
-	max_pathval = Train->node[nn[l]].pathval;
-	max_index = nn[l];
       }
     }
     Test->node[i].label = Train->node[max_index].truelabel;
+    //fprintf(stderr,"\nID of the max_index: %d\n (label %d)", max_index, Train->node[max_index].truelabel);
   }
   
   free(d);
