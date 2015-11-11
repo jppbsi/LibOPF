@@ -259,6 +259,14 @@ void opf_OPFknnTraining(Subgraph *Train, Subgraph *Eval, int kmax){
   opf_DestroyArcs(Train);
 }
 
+void Myopf_OPFknnTraining(Subgraph *Train, Subgraph *Eval, int kmax){  
+  Train->bestk = Myopf_OPFknnLearning(Train, Eval, kmax);
+  opf_CreateArcs(Train, Train->bestk);
+  opf_PDF(Train);
+  opf_OPFClustering4SupervisedLearning(Train);
+  opf_DestroyArcs(Train);
+}
+
 int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
   int k, bestk = 1;
   float MaxAcc = -FLT_MAX, Acc = 0.0;
@@ -268,12 +276,44 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
     fprintf(stderr,"\nEvaluating k = %d ... ", k);
     Train_cpy->bestk = k;
     
-    fprintf(stderr,"\nFLAG 1");opf_CreateArcs(Train_cpy, k);
-    fprintf(stderr,"\nFLAG 2");opf_PDF(Train_cpy);
-    fprintf(stderr,"\nFLAG 3");opf_OPFClustering4SupervisedLearning(Train_cpy);
+    opf_CreateArcs(Train_cpy, k);
+    opf_PDF(Train_cpy);
+    opf_OPFClustering4SupervisedLearning(Train_cpy);
     
-    fprintf(stderr,"\nFLAG 4");opf_OPFknnClassify(Train_cpy, Eval_cpy);
-    fprintf(stderr,"\nFLAG 5");Acc = opf_Accuracy(Eval_cpy);
+    opf_OPFknnClassify(Train_cpy, Eval_cpy);
+    Acc = opf_Accuracy(Eval_cpy);
+    fprintf(stderr," %.2f%%", Acc*100);
+
+    if(Acc > MaxAcc){
+      MaxAcc = Acc;
+      bestk = k;
+    }
+    
+    opf_DestroyArcs(Train_cpy);
+  }
+
+  DestroySubgraph(&Train_cpy);
+  DestroySubgraph(&Eval_cpy);
+  fprintf(stderr,"\n	-> best k: %d", bestk);
+  
+  return bestk;
+}
+
+int Myopf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
+  int k, bestk = 1;
+  float MaxAcc = -FLT_MAX, Acc = 0.0;
+  Subgraph *Train_cpy = CopySubgraph(Train), *Eval_cpy = CopySubgraph(Eval);
+  
+  for(k = 1; k <= kmax; k++){
+    fprintf(stderr,"\nEvaluating k = %d ... ", k);
+    Train_cpy->bestk = k;
+    
+    opf_CreateArcs(Train_cpy, k);
+    opf_PDF(Train_cpy);
+    opf_OPFClustering4SupervisedLearning(Train_cpy);
+    
+    Myopf_OPFknnClassify(Train_cpy, Eval_cpy);
+    Acc = opf_Accuracy(Eval_cpy);
     fprintf(stderr," %.2f%%", Acc*100);
 
     if(Acc > MaxAcc){
@@ -294,6 +334,61 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
 // OPFknn Classification function 
 void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
   int i, j, k, l, knn = Train->bestk, *nn = AllocIntArray(knn+1);
+  float weight, dist, *d = AllocFloatArray(Train->bestk+1), tmp, cost, dens;
+		  
+  for (i = 0; i < Test->nnodes; i++){
+    cost = -FLT_MAX;
+    
+    /* it computes the k-nearest neighbours of test sample i */
+    for (l = 0; l < knn; l++)
+      d[l] = FLT_MAX;
+	  
+    for (j = 0; j < Train->nnodes; j++){
+      if (j != i){
+	if (!opf_PrecomputedDistance) d[knn] = opf_ArcWeight(Test->node[i].feat,Train->node[j].feat,Train->nfeats);
+	else d[knn] = opf_DistanceValue[Test->node[i].position][Train->node[j].position];
+	nn[knn]= j;
+	k = knn;
+	while ((k > 0) && (d[k] < d[k-1])){
+	  dist = d[k];
+	  l = nn[k];
+	  d[k] = d[k-1];
+	  nn[k] = nn[k-1];
+	  d[k-1] = dist;
+	  nn[k-1] = l;
+	  k--;
+	}
+      }
+    }
+  
+    /* computing the density of testing sample i */
+    dens = 0;
+    for(l = 0; l < knn; l++){
+      if (!opf_PrecomputedDistance) weight = opf_ArcWeight(Test->node[i].feat,Train->node[nn[l]].feat,Train->nfeats);
+      else weight = opf_DistanceValue[Test->node[i].position][Train->node[nn[l]].position];
+      dens+=exp(-dist/Train->K);
+    }
+    dens/=knn;
+    
+    for (l = 0; l < knn; l++){
+      if (d[l] != INT_MAX){
+	tmp = MIN(Train->node[nn[l]].pathval, dens);
+        if(tmp > cost){
+	  cost = tmp;
+	  Test->node[i].label = Train->node[nn[l]].truelabel;
+	}
+      }
+    }
+  }
+  
+  free(d);
+  free(nn);
+}
+
+// OPFknn Classification function 
+void Myopf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
+  int i, j, k, l, knn = Train->bestk, *nn = AllocIntArray(knn+1);
+  int max_pathval, max_index;
   float weight, dist, *d = AllocFloatArray(Train->bestk+1), tmp, cost;
 		  
   for (i = 0; i < Test->nnodes; i++){
@@ -321,8 +416,11 @@ void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
       }
     }
   
-    for (l = 0; l < knn; l++){
-      if (d[l] != INT_MAX){
+    max_pathval = -FLT_MAX;
+    max_index = -1;
+    
+    for (l = 1; l < knn; l++){
+      /*if (d[l] != INT_MAX){
         if (!opf_PrecomputedDistance) weight = opf_ArcWeight(Test->node[i].feat,Train->node[nn[l]].feat,Train->nfeats);
         else weight = opf_DistanceValue[Test->node[i].position][Train->node[nn[l]].position];
 		
@@ -331,8 +429,13 @@ void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
 	  cost = tmp;
 	  Test->node[i].label = Train->node[nn[l]].truelabel;
 	}
+      }*/
+      if(Train->node[nn[l]].pathval > max_pathval){
+	max_pathval = Train->node[nn[l]].pathval;
+	max_index = nn[l];
       }
     }
+    Test->node[i].label = Train->node[max_index].truelabel;
   }
   
   free(d);

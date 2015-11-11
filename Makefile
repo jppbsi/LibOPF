@@ -11,7 +11,7 @@ FLAGS=  -O3 -Wall
 
 INCFLAGS = -I$(INCLUDE) -I$(INCLUDE)/$(UTIL)
 
-all: libOPF opf_split opf_accuracy opf_train opf_classify opf_learn opf_distance opf_info opf_fold opf_merge opf_cluster statistics txt2opf opf2txt opf_check opf_normalize opfknn_train opfknn_classify
+all: libOPF opf_split opf_accuracy opf_train opf_classify opf_learn opf_distance opf_info opf_fold opf_merge opf_cluster statistics txt2opf opf2txt opf_check opf_normalize opfknn_train opfknn_classify Myopfknn_train Myopfknn_classify
 
 libOPF: libOPF-build
 	echo "libOPF.a built..."
@@ -83,6 +83,12 @@ opfknn_train: libOPF
 
 opfknn_classify: libOPF
 	$(CC) $(FLAGS) $(INCFLAGS) src/opfknn_classify.c  -L./lib -o bin/opfknn_classify -lOPF -lm
+
+Myopfknn_train: libOPF
+	$(CC) $(FLAGS) $(INCFLAGS) src/Myopfknn_train.c  -L./lib -o bin/Myopfknn_train -lOPF -lm
+
+Myopfknn_classify: libOPF
+	$(CC) $(FLAGS) $(INCFLAGS) src/Myopfknn_classify.c  -L./lib -o bin/Myopfknn_classify -lOPF -lm
 
 util: $(SRC)/$(UTIL)/common.c $(SRC)/$(UTIL)/set.c $(SRC)/$(UTIL)/gqueue.c $(SRC)/$(UTIL)/realheap.c $(SRC)/$(UTIL)/sgctree.c $(SRC)/$(UTIL)/subgraph.c
 	$(CC) $(FLAGS) $(INCFLAGS) -c $(SRC)/$(UTIL)/common.c -o $(OBJ)/common.o
