@@ -418,18 +418,25 @@ void Myopf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
     }
   
     /* computing the density of testing sample i */
-    dens = 0;
-    for(l = 0; l < knn; l++){
-      if (!opf_PrecomputedDistance) weight = opf_ArcWeight(Test->node[i].feat,Train->node[nn[l]].feat,Train->nfeats);
-      else weight = opf_DistanceValue[Test->node[i].position][Train->node[nn[l]].position];
-      dens+=exp(-dist/Train->K);
-    }
-    dens/=knn;
-    
     max_pathval = -FLT_MAX;
     max_index = -1;
     
-    for (l = 0; l < knn; l++){
+    dens = 0;
+    for(l = 0; l < knn; l++){
+      /*if (!opf_PrecomputedDistance) weight = opf_ArcWeight(Test->node[i].feat,Train->node[nn[l]].feat,Train->nfeats);
+      else weight = opf_DistanceValue[Test->node[i].position][Train->node[nn[l]].position];
+      dens+=exp(-dist/Train->K);*/
+      
+      if(Train->node[nn[l]].pathval > max_pathval){
+	  max_pathval = Train->node[nn[l]].pathval;
+	  max_index = nn[l];
+      }
+    }
+    //dens/=knn;
+    Test->node[i].label = Train->node[max_index].truelabel;
+    
+    
+    /*for (l = 0; l < knn; l++){
       if (d[l] != INT_MAX){
         /*tmp = MIN(Train->node[nn[l]].pathval, dens);
 	fprintf(stderr,"\nNode: %d -> ", nn[l]);
@@ -442,12 +449,12 @@ void Myopf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
 	}*/
       
       
-	if(Train->node[nn[l]].pathval > max_pathval){
+	/*if(Train->node[nn[l]].pathval > max_pathval){
 	  max_pathval = Train->node[nn[l]].pathval;
 	  max_index = nn[l];
 	}
       }
-    }
+    }*/
     Test->node[i].label = Train->node[max_index].truelabel;
     //fprintf(stderr,"\nID of the max_index: %d\n (label %d)", max_index, Train->node[max_index].truelabel);
   }
