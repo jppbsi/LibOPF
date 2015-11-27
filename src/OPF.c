@@ -1025,10 +1025,9 @@ Subgraph **kFoldSubgraph(Subgraph *sg, int k){
 						out[i]->node[z].feat[n]=sg->node[j].feat[n];
 					out[i]->node[z].truelabel = sg->node[j].truelabel;
 					nelems[sg->node[j].truelabel] = nelems[sg->node[j].truelabel] - 1;
-					sg->node[j].status = NIL;
-					totelems--;
+					sg->node[j].status = NIL;					
 					z++;
-				}
+				}totelems--;
 			}
 		}
 	}
