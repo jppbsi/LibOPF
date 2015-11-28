@@ -45,10 +45,6 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax); //It learns t
 void opf_OPFClustering4SupervisedLearning(Subgraph *sg); //it executes the OPF clustering algorithm using the labeled samples
 void  opf_OPFknnClassify(Subgraph *Train, Subgraph *Test); // OPFknn classification function
 
-void Myopf_OPFknnTraining(Subgraph *Train, Subgraph *Eval, int kmax); //Training function
-int Myopf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax); //It learns the best k value, i.e., the ones that maximizes the accuracy over a validation set
-void  Myopf_OPFknnClassify(Subgraph *Train, Subgraph *Test); // OPFknn classification function
-
 /*--------- Unsupervised OPF -------------------------------------*/
 void  opf_OPFClustering(Subgraph *sg); //Training function: it computes unsupervised training for the pre-computed best k.
 
