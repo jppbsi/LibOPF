@@ -837,10 +837,19 @@ Subgraph **kFoldSubgraph(Subgraph *sg, int k){
 	int totelems, foldsize = 0, i, *label = (int *)calloc((sg->nlabels+1),sizeof(int));
 	int *nelems = (int *)calloc((sg->nlabels+1),sizeof(int)), j, z, w, m, n;
 	int *nelems_aux = (int *)calloc((sg->nlabels+1),sizeof(int)), *resto = (int *)calloc((sg->nlabels+1),sizeof(int));
+	char msg[64];
 
 	for (i=0; i < sg->nnodes; i++){
 	    sg->node[i].status = 0;
 	    label[sg->node[i].truelabel]++;
+	}
+	
+	for(i = 1; i <= sg->nlabels; i++){
+	  if(label[i] < k){
+	    sprintf(msg, "You do not have a sufficient amount of samples from class %d",i);
+	    Error(msg,"kFoldSubgraph");
+	    return NULL;
+	  }
 	}
 
 	for (i=0; i < sg->nnodes; i++)
