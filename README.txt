@@ -575,6 +575,17 @@ Therefore, a recommended pipeline to create and to check the correctness of your
 (2) use tools/opf_check to check if it is in the proper format; and
 (3) if your file format has passed through opf_check requirements, use tools/txt2opf to convert your txt file to a binary version to be used in LibOPF.
 
+-> opf2svm: a program to convert binary OPF files to LibSVM format.
+
+Usage of ‘opf2svm’ 
+====================
+
+Usage: opf2svm <P1> <P2>
+
+P1: input binary OPF file name
+P2: output LibSVM file name
+
+
 Accuracy computation
 ====================
 
