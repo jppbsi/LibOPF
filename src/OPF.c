@@ -294,7 +294,7 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
 // OPFknn Classification function 
 void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
   int i, j, k, l, knn = Train->bestk, *nn = AllocIntArray(knn+1);
-  float weight, dist, *d = AllocFloatArray(Train->bestk+1), tmp, cost, dens;
+  float weight, dist = -1.0, *d = AllocFloatArray(Train->bestk+1), tmp, cost, dens;
 		  
   for (i = 0; i < Test->nnodes; i++){
     cost = -FLT_MAX;
