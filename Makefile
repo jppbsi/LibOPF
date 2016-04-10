@@ -4,7 +4,7 @@ SRC=./src
 OBJ=./obj
 UTIL=util
 
-CC=gcc-5
+CC=gcc
 
 FLAGS=  -O3 -Wall
 
