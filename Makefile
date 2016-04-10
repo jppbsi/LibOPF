@@ -4,14 +4,14 @@ SRC=./src
 OBJ=./obj
 UTIL=util
 
-CC=gcc
+CC=gcc-5
 
 FLAGS=  -O3 -Wall
 
 
 INCFLAGS = -I$(INCLUDE) -I$(INCLUDE)/$(UTIL)
 
-all: libOPF opf_split opf_accuracy opf_train opf_classify opf_learn opf_distance opf_info opf_fold opf_merge opf_cluster statistics txt2opf opf2txt opf_check opf_normalize opfknn_train opfknn_classify opf2svm
+all: libOPF opf_split opf_accuracy opf_train opf_classify opf_learn opf_distance opf_info opf_fold opf_merge opf_cluster statistics txt2opf opf2txt opf_check opf_normalize opfknn_train opfknn_classify opf2svm svm2opf
 
 libOPF: libOPF-build
 	echo "libOPF.a built..."
@@ -78,6 +78,9 @@ opf2txt: libOPF
 opf2svm: libOPF
 	$(CC) $(FLAGS) $(INCFLAGS) tools/src/opf2svm.c  -L./lib -o tools/opf2svm -lOPF -lm
 
+svm2opf: libOPF
+	$(CC) $(FLAGS) $(INCFLAGS) tools/src/svm2opf.c  -L./lib -o tools/svm2opf -lOPF -lm
+
 opf_normalize: libOPF
 	$(CC) $(FLAGS) $(INCFLAGS) src/opf_normalize.c  -L./lib -o bin/opf_normalize -lOPF -lm
 	
@@ -116,7 +119,7 @@ OPF-ift.o: $(SRC)/OPF.c
 ## Cleaning-up
 
 clean:
-	rm -f $(LIB)/lib*.a; rm -f $(OBJ)/*.o bin/* tools/opf_check tools/statistics tools/txt2opf tools/opf2txt tools/opf_check tools/opf2svm
+	rm -f $(LIB)/lib*.a; rm -f $(OBJ)/*.o bin/* tools/opf_check tools/statistics tools/txt2opf tools/opf2txt tools/opf_check tools/opf2svm tools/svm2opf
 
 clean_results:
 	rm -f *.out *.opf *.acc *.time *.opf training.dat evaluating.dat testing.dat

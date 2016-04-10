@@ -80,6 +80,7 @@ void WriteSubgraph(Subgraph *g, char *file){
     fwrite(&g->nnodes, sizeof(int), 1, fp);
     fwrite(&g->nlabels, sizeof(int), 1, fp);
     fwrite(&g->nfeats, sizeof(int), 1, fp);
+    fprintf(stderr, "Samples: %d\nLabels: %d\nFeatures: %d", g->nnodes, g->nlabels, g->nfeats);
 
     /*writing position(id), label and features*/
     for (i = 0; i < g->nnodes; i++){
