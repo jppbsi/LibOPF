@@ -49,7 +49,7 @@ void Error(char *msg,char *func); /* It prints error message and exits
 void Warning(char *msg,char *func); /* It prints warning message and
                                        leaves the routine. */
 
-inline void Change(int *a, int *b); /* It changes content between a and b */
+void Change(int *a, int *b); /* It changes content between a and b */
 int RandomInteger (int low, int high);/* Generates a random number within [low,high].
                                         http://www.ime.usp.br/~pf/algoritmos/aulas/random.html
                                         */
