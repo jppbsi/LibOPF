@@ -377,8 +377,6 @@ void opf_OPFClustering4SupervisedLearning(Subgraph *sg){
         }
     }
 
-    // Compute clustering
-
     pathval = AllocFloatArray(sg->nnodes);
     Q = CreateRealHeap(sg->nnodes, pathval);
     SetRemovalPolicyRealHeap(Q, MAXVALUE);
@@ -405,6 +403,7 @@ void opf_OPFClustering4SupervisedLearning(Subgraph *sg){
 	  q = Saux->elem;
 	  if ( Q->color[q] != BLACK ) {
 	    tmp = MIN( pathval[ p ], sg->node[ q ].dens);
+	    if(sg->node[p].truelabel != sg->node[q].truelabel) tmp = -FLT_MAX;
 	    if ( tmp > pathval[ q ] ){
 	      UpdateRealHeap(Q,q,tmp);
 	      sg->node[ q ].pred  = p;
