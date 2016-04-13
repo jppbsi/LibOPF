@@ -1,7 +1,7 @@
 LibOPF is a library of functions and programs for free usage in the
 design of optimum-path forest classifiers. This second version 
 contains some additional resources related to the supervised
-OPF classifier reported in references [PapaISVC08,PapaIJIST09,PapaPR12], and also
+OPF classifier reported in references [PapaIJIST09,PapaPR12], and also
 contains the unsupervised version of OPF reported in reference
 [RochaIJIST09].
 
@@ -585,6 +585,16 @@ Usage: opf2svm <P1> <P2>
 P1: input binary OPF file name
 P2: output LibSVM file name
 
+-> svm2opf: a program to convert LibSVM files to binary OPF format.
+
+Usage of ‘svm2opf’ 
+====================
+
+Usage: svm2opf <P1> <P2>
+
+P1: input LibSVM file name
+P2: output binary OPF file name
+
 
 Accuracy computation
 ====================
@@ -610,13 +620,13 @@ Additional Information
 
 If you find LibOPF helpful, please cite the references
 
-@Manual{LibOPF09,
+@Manual{LibOPF15,
   author =	 {J.P. Papa and A.X. Falc{\~{a}}o and C.T.N. Suzuki},
   title =	 {{LibOPF}: {A} library for the design of 
                    optimum-path forest classifiers},
   institution = {Institute of Computing, University of Campinas},
-  year =	 {2009},
-  note =	 {Software version 2.0 available at 
+  year =	 {2015},
+  note =	 {Software version 3.1 available at 
                  \url{http://www.ic.unicamp.br/\~{}afalcao/LibOPF}}
 }
 
@@ -683,3 +693,7 @@ If you used MPEG-7 dataset from LibOPF, please cite:
 
 For any questions and comments, please send your email to
 papa.joaopaulo@gmail.com or afalcao@ic.unicamp.br.
+
+----
+We are also grateful to several colleagues around the world to their effort dedicated in the LibOPF:
+- Gustavo Henrique de Rosa (Sao Paulo State University): svm2opf
