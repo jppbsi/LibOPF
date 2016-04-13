@@ -27,7 +27,7 @@ void InsertLabel(struct label **node, int real, int value){
 	*node = p;
 }
 
-int FindLabel(struct label *node, int value){
+/*int FindLabel(struct label *node, int value){
 	struct label *p = node;
 
 	while(p!=NULL){
@@ -36,7 +36,7 @@ int FindLabel(struct label *node, int value){
 		p = p->next;
 	}
 	return 0;
-}
+}*/
 
 struct data CountData(char *file){
 	struct data d;
@@ -81,7 +81,7 @@ int main(int argc, char** argv){
 	FILE *file = fopen(argv[1],"r");
 	int i;
 	int index, label;
-	int aux = 1;
+	//int aux = 1;
 	float value;
 	char *line = calloc(N, sizeof(char));
 	struct data d;
@@ -91,7 +91,7 @@ int main(int argc, char** argv){
 	fprintf(stderr, "Allocating memory...\n");
 	Subgraph *graph = CreateSubgraph(d.ndata);
 	fprintf(stderr, "OK.\n\n");
-	struct label *node = NULL;
+	//struct label *node = NULL;
 	graph->nlabels = d.nlabels;
 	graph->nfeats = d.nfeats;
 	fprintf(stderr, "Creating graph...\n");
@@ -100,13 +100,14 @@ int main(int argc, char** argv){
 		graph->node[i].position = i;
 		seg = strtok(line, " ");
 		label = atoi(seg);
-		graph->node[i].truelabel = FindLabel(node, label);
-		//fprintf(stderr,"%d\n", graph->node[i].truelabel);
+		//fprintf(stderr,"%d\n", label);
+		graph->node[i].truelabel = label;
+		/*fprintf(stderr,"%d\n", graph->node[i].truelabel);
 		if(graph->node[i].truelabel == 0){
 			graph->node[i].truelabel = aux;
 			InsertLabel(&node, label, aux);
 			aux++;
-		}
+		}*/
 		graph->node[i].feat = calloc(d.nfeats, sizeof(float));
 		while(seg != NULL){
 			seg = strtok(NULL, ":\n");
