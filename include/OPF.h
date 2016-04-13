@@ -43,6 +43,7 @@ void opf_OPFAgglomerativeLearning(Subgraph **sgtrain, Subgraph **sgeval); //Aggl
 void opf_OPFknnTraining(Subgraph *Train, Subgraph *Eval, int kmax); //Training function
 int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax); //It learns the best k value, i.e., the ones that maximizes the accuracy over a validation set
 void opf_OPFClustering4SupervisedLearning(Subgraph *sg); //it executes the OPF clustering algorithm using the labeled samples
+void opf_OPFClustering4SupervisedLearningForceOnePrototypePerClass(Subgraph *sg); //it executes the OPF clustering algorithm using the labeled samples
 void  opf_OPFknnClassify(Subgraph *Train, Subgraph *Test); // OPFknn classification function
 
 /*--------- Unsupervised OPF -------------------------------------*/
