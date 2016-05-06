@@ -77,6 +77,8 @@ void  opf_PDF(Subgraph *sg); //it computes the PDf for each node
 void opf_ElimMaxBelowVolume(Subgraph *sg, int V); // Eliminate maxima in the graph with volume below V
 void opf_ElimMaxBelowArea(Subgraph *sg, int A); //Eliminate maxima in the graph with area below A
 void opf_ElimMaxBelowH(Subgraph *sg, float H);// Eliminate maxima in the graph with pdf below H
+void opf_OPFPruning(Subgraph **gTrain, Subgraph **gEval, float desiredAcc); //it performs the OPF pruning algorithm
+void opf_OPFClassifyingAndMarkNodes(Subgraph *sgtrain, Subgraph *sg); //Classification function: it classifies samples from sg and it marks as relevant all training samples (and the whole path until the prototype) that were used in any classification process -----
 
 /*------------ Distance functions ------------------------------ */
 float opf_EuclDist(float *f1, float *f2, int n); //Computes Euclidean distance between feature vectors

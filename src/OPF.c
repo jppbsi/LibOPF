@@ -126,6 +126,48 @@ void opf_OPFClassifying(Subgraph *sgtrain, Subgraph *sg)
   }
 }
 
+/*Classification function: it classifies samples from sg and it marks as relevant
+all training samples (and the whole path until the prototype) that were used in any classification process ----- */
+void opf_OPFClassifyingAndMarkNodes(Subgraph *sgtrain, Subgraph *sg)
+{
+  int i, j, k, l, label = -1, conqueror;
+  float tmp, weight, minCost;
+
+  for (i = 0; i < sg->nnodes; i++)
+  {
+    j       = 0;
+    k       = sgtrain->ordered_list_of_nodes[j];
+    if(!opf_PrecomputedDistance)
+      weight = opf_ArcWeight(sgtrain->node[k].feat,sg->node[i].feat,sg->nfeats);
+    else
+      weight = opf_DistanceValue[sgtrain->node[k].position][sg->node[i].position];
+
+    minCost = MAX(sgtrain->node[k].pathval, weight);
+    label   = sgtrain->node[k].label;
+
+    while((j < sgtrain->nnodes-1)&&
+    (minCost > sgtrain->node[sgtrain->ordered_list_of_nodes[j+1]].pathval)){
+
+      l  = sgtrain->ordered_list_of_nodes[j+1];
+
+      if(!opf_PrecomputedDistance)
+	weight = opf_ArcWeight(sgtrain->node[l].feat,sg->node[i].feat,sg->nfeats);
+      else
+	weight = opf_DistanceValue[sgtrain->node[l].position][sg->node[i].position];
+      tmp = MAX(sgtrain->node[l].pathval, weight);
+      if(tmp < minCost){
+	minCost = tmp;
+	label = sgtrain->node[l].label;
+	conqueror = l;
+      }
+      j++;
+      k  = l;
+    }
+    sg->node[i].label = label;
+    opf_MarkNodes(sg, conqueror);
+  }
+}
+
 // Semi-supervised learning function
 Subgraph *opf_OPFSemiLearning(Subgraph *sg, Subgraph *nonsg, Subgraph *sgeval){
 
@@ -576,8 +618,10 @@ void opf_OPFClustering(Subgraph *sg){
 void opf_ResetSubgraph(Subgraph *sg){
   int i;
 
-  for (i = 0; i < sg->nnodes; i++)
+  for (i = 0; i < sg->nnodes; i++){
     sg->node[i].pred    = NIL;
+    sg->node[i].relevant = 0;
+  }
   opf_DestroyArcs(sg);
 }
 
@@ -1914,4 +1958,22 @@ float opf_NormalizedCutToKmax( Subgraph *sg )
     return( ncut );
 }
 
-
+// it performs the OPF pruning algorithm: desiredAcc should be within [0,1]
+void opf_OPFPruning(Subgraph **gTrain, Subgraph **gEval, float desiredAcc){
+  int max_iterations = 100, t = 1;
+  float currentAcc = -1.0, oldAcc;
+  
+  while ((t <= max_iterations) && (fabs(currentAcc-oldAcc) <= desiredAcc)){
+    oldAcc = currentAcc;
+    opf_ResetSubgraph(*gTrain);
+    
+    opf_OPFTraining(*gTrain);
+    opf_OPFClassifyingAndMarkNodes(*gTrain, *gEval);
+    opf_RemoveIrrelevantNodes(gTrain);
+    
+    opf_OPFTraining(*gTrain);
+    opf_OPFClassifying(*gTrain, *gEval);
+    currentAcc = opf_Accuracy(*gTrain);
+  }
+  
+}
