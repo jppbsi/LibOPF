@@ -1974,6 +1974,7 @@ void opf_OPFPruning(Subgraph **gTrain, Subgraph **gEval, float desiredAcc){
     opf_OPFTraining(*gTrain);
     opf_OPFClassifying(*gTrain, *gEval);
     currentAcc = opf_Accuracy(*gTrain);
+    t++;
   }
   
 }
