@@ -1961,7 +1961,7 @@ float opf_NormalizedCutToKmax( Subgraph *sg )
 // it performs the OPF pruning algorithm: desiredAcc should be within [0,1]
 void opf_OPFPruning(Subgraph **gTrain, Subgraph **gEval, float desiredAcc){
   int max_iterations = 100, t = 1;
-  float currentAcc = -1.0, oldAcc;
+  float currentAcc = 0, oldAcc = 0;
   
   while ((t <= max_iterations) && (fabs(currentAcc-oldAcc) <= desiredAcc)){
     oldAcc = currentAcc;
