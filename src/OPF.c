@@ -130,7 +130,7 @@ void opf_OPFClassifying(Subgraph *sgtrain, Subgraph *sg)
 all training samples (and the whole path until the prototype) that were used in any classification process ----- */
 void opf_OPFClassifyingAndMarkNodes(Subgraph *sgtrain, Subgraph *sg)
 {
-  int i, j, k, l, label = -1, conqueror;
+  int i, j, k, l, label = -1, conqueror = -1;
   float tmp, weight, minCost;
 
   for (i = 0; i < sg->nnodes; i++)
@@ -164,7 +164,7 @@ void opf_OPFClassifyingAndMarkNodes(Subgraph *sgtrain, Subgraph *sg)
       k  = l;
     }
     sg->node[i].label = label;
-    opf_MarkNodes(sg, conqueror);
+    opf_MarkNodes(sgtrain, conqueror);
   }
 }
 
@@ -1961,9 +1961,16 @@ float opf_NormalizedCutToKmax( Subgraph *sg )
 // it performs the OPF pruning algorithm: desiredAcc should be within [0,1]
 void opf_OPFPruning(Subgraph **gTrain, Subgraph **gEval, float desiredAcc){
   int max_iterations = 100, t = 1;
-  float currentAcc = 0, oldAcc = 0;
+  float currentAcc, oldAcc;
+  
+  /* initial evaluation */
+  opf_OPFTraining(*gTrain);
+  opf_OPFClassifying(*gTrain, *gEval);
+  currentAcc = opf_Accuracy(*gTrain);
+  oldAcc = currentAcc;
   
   while ((t <= max_iterations) && (fabs(currentAcc-oldAcc) <= desiredAcc)){
+    fprintf(stderr,"\nRunning iteration %d ... ", t);
     oldAcc = currentAcc;
     opf_ResetSubgraph(*gTrain);
     
@@ -1974,7 +1981,9 @@ void opf_OPFPruning(Subgraph **gTrain, Subgraph **gEval, float desiredAcc){
     opf_OPFTraining(*gTrain);
     opf_OPFClassifying(*gTrain, *gEval);
     currentAcc = opf_Accuracy(*gTrain);
+    fprintf(stderr,"Current accuracy: %.2f%% ", currentAcc*100);
     t++;
+    fprintf(stderr,"OK");
   }
   
 }
