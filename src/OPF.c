@@ -675,7 +675,6 @@ void opf_RemoveIrrelevantNodes(Subgraph **sg){
     if (!(*sg)->node[i].relevant)
       num_of_irrelevants++;
   }
-  fprintf(stderr,")
 
   if (num_of_irrelevants>0){
     newsg = CreateSubgraph((*sg)->nnodes - num_of_irrelevants);
