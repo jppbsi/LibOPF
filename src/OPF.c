@@ -675,6 +675,7 @@ void opf_RemoveIrrelevantNodes(Subgraph **sg){
     if (!(*sg)->node[i].relevant)
       num_of_irrelevants++;
   }
+  fprintf(stderr,")
 
   if (num_of_irrelevants>0){
     newsg = CreateSubgraph((*sg)->nnodes - num_of_irrelevants);
@@ -1980,7 +1981,7 @@ void opf_OPFPruning(Subgraph **gTrain, Subgraph **gEval, float desiredAcc){
     
     opf_OPFTraining(*gTrain);
     opf_OPFClassifying(*gTrain, *gEval);
-    currentAcc = opf_Accuracy(*gTrain);
+    currentAcc = opf_Accuracy(*gEval);
     fprintf(stderr,"Current accuracy: %.2f%% ", currentAcc*100);
     t++;
     fprintf(stderr,"OK");
