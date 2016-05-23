@@ -2017,7 +2017,7 @@ float *opf_AccuracyForLabel(Subgraph *sg){
         }
     }
 
-   Acc = (float *)calloc(nlabels, sizeof(float));
+   Acc = (float *)calloc(nlabels+1, sizeof(float));
 
     for(i = 1; i <= sg->nlabels; i++){
         if(nclass[i] != 0)
