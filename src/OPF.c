@@ -2027,7 +2027,6 @@ float *opf_AccuracyForLabel(Subgraph *sg){
     for(i = 0; i <= sg->nlabels; i++)
         free(error_matrix[i]);
     free(error_matrix);
-    free(Acc);
     free(nclass);
 
     return Acc;
