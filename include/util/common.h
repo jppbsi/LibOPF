@@ -7,6 +7,8 @@
 #include <string.h>
 #include <limits.h>
 #include <float.h>
+#include <sys/time.h>
+#include <time.h>
 
 /* Error messages */
 
@@ -31,6 +33,21 @@ typedef struct timeval timer;
 #define DECREASING  0
 #define Epsilon     1E-05
 
+#define IM1 2147483563
+#define IM2 2147483399
+#define AM (1.0/IM1)
+#define IMM1 (IM1-1)
+#define IA1 40014
+#define IA2 40692
+#define IQ1 53668
+#define IQ2 52774
+#define IR1 12211
+#define IR2 3791
+#define NTAB 32
+#define NDIV (1+IMM1/NTAB)
+#define EPS 1.e-14
+#define RNMX (1.0-EPS)
+
 /* Common operations */
 
 #ifndef MAX
@@ -50,8 +67,10 @@ void Warning(char *msg,char *func); /* It prints warning message and
                                        leaves the routine. */
 
 void Change(int *a, int *b); /* It changes content between a and b */
-int RandomInteger (int low, int high);/* Generates a random number within [low,high].
-                                        http://www.ime.usp.br/~pf/algoritmos/aulas/random.html
-                                        */
+
+double ran2(int *idum);
+int srandinter(int seed); /* It initializes the random number generator */
+int RandomInteger(double low, double high);/* It returns a random number uniformly distributed within [low,high].
+                                              http://www.physics.drexel.edu/courses/Comp_Phys/Physics-306/random.c */
 
 #endif
