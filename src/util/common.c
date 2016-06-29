@@ -66,7 +66,7 @@ void Change(int *a, int *b){ /* It changes content between a and b */
  * The source code to generate random numbers was taken from http://www.physics.drexel.edu/courses/Comp_Phys/Physics-306/random.c.
  */
 
-double ran2(int *idum){
+double ran(int *idum){
     int j;
     int k;
     static int idum2 = 123456789;
@@ -126,7 +126,7 @@ double ran2(int *idum){
 static int randx = 0; /* copy of random seed (internal use only) */
 
 /* It initializes the random number generator */
-int srandinter(int seed){	
+int seedrandinter(int seed){	
     if (seed == 0) seed = (int) time(NULL);	/* initialize from the system
 						   clock if seed = 0 */
     randx = -abs(seed);
@@ -135,6 +135,6 @@ int srandinter(int seed){
 
 /* It returns a random number uniformly distributed within [low,high] */
 int RandomInteger(double low, double high){	
-    if (randx == 0) srandinter(0);
-    return low + (high-low)*((double)ran2(&randx));
+    if (randx == 0) seedrandinter(0);
+    return low + (high-low)*((double)ran(&randx));
 }

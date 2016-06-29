@@ -68,8 +68,8 @@ void Warning(char *msg,char *func); /* It prints warning message and
 
 void Change(int *a, int *b); /* It changes content between a and b */
 
-double ran2(int *idum);
-int srandinter(int seed); /* It initializes the random number generator */
+double ran(int *idum);
+int seedrandinter(int seed); /* It initializes the random number generator */
 int RandomInteger(double low, double high);/* It returns a random number uniformly distributed within [low,high].
                                               http://www.physics.drexel.edu/courses/Comp_Phys/Physics-306/random.c */
 
