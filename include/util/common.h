@@ -70,7 +70,9 @@ void Change(int *a, int *b); /* It changes content between a and b */
 
 double ran(int *idum);
 int seedrandinter(int seed); /* It initializes the random number generator */
-int RandomInteger(double low, double high);/* It returns a random number uniformly distributed within [low,high].
+int RandomInteger(double low, double high);/* It returns a random integer number uniformly distributed within [low,high].
+                                              http://www.physics.drexel.edu/courses/Comp_Phys/Physics-306/random.c */
+double RandomFloat(double low, double high);/* It returns a random float number uniformly distributed within [low,high].
                                               http://www.physics.drexel.edu/courses/Comp_Phys/Physics-306/random.c */
 
 #endif

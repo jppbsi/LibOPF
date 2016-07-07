@@ -133,8 +133,14 @@ int seedrandinter(int seed){
     return seed;		/* return seed in case we need to repeat */
 }
 
-/* It returns a random number uniformly distributed within [low,high] */
+/* It returns a random integer number uniformly distributed within [low,high] */
 int RandomInteger(double low, double high){	
+    if (randx == 0) seedrandinter(0);
+    return low + (high-low)*((double)ran(&randx));
+}
+
+/* It returns a random float number uniformly distributed within [low,high] */
+double RandomFloat(double low, double high){	
     if (randx == 0) seedrandinter(0);
     return low + (high-low)*((double)ran(&randx));
 }
