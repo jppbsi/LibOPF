@@ -144,3 +144,21 @@ double RandomFloat(double low, double high){
     if (randx == 0) seedrandinter(0);
     return low + (high-low)*((double)ran(&randx));
 }
+
+/* It returns a number drawn from a Gaussian distribution
+Parameters:
+mean: mean of the distribution
+variance: variance of the distribution */
+double RandomGaussian(double mean, double variance){
+    double v, x, y, r;
+
+    do{
+        x = (double)2*RandomFloat(1,100)/99;
+        y = (double)2*RandomFloat(1,100)/99;
+        r = x*x + y*y;
+    }while(r >= 1 || r == 0);
+
+    v = x*sqrt(-2*log(r)/r)*variance+mean;
+
+   return v;
+}
