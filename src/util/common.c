@@ -162,3 +162,13 @@ double RandomGaussian(double mean, double variance){
 
    return v;
 }
+
+/* It returns a number drawn from Bernoulli distribution with probability p */
+int BernoulliDistribution(double p){
+  double r;
+  r = RandomFloat(0, 1);
+  if (r < p)
+    return 1;
+  else
+    return 0;
+}

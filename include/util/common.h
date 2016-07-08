@@ -75,5 +75,6 @@ int RandomInteger(double low, double high); /* It returns a random integer numbe
 double RandomFloat(double low, double high); /* It returns a random float number uniformly distributed within [low,high].
                                               http://www.physics.drexel.edu/courses/Comp_Phys/Physics-306/random.c */
 double RandomGaussian(double mean, double variance); /* It returns a number drawn from a Gaussian distribution */
+int BernoulliDistribution(double p); /* It returns a number drawn from Bernoulli distribution with probability p */
 
 #endif
