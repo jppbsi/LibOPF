@@ -67,6 +67,7 @@ Subgraph **opf_kFoldSubgraph(Subgraph *sg, int k); //It creates k folds for cros
 void opf_SplitSubgraph(Subgraph *sg, Subgraph **sg1, Subgraph **sg2, float perc1); //Split subgraph into two parts such that the size of the first part  is given by a percentual of samples.
 Subgraph *opf_MergeSubgraph(Subgraph *sg1, Subgraph *sg2); //Merge two subgraphs
 float opf_Accuracy(Subgraph *g); //Compute accuracy
+float *opf_Accuracy4Label(Subgraph *sg); // Compute accuracy for each class and it outputs an array with the values
 int **opf_ConfusionMatrix(Subgraph *sg); //Compute the confusion matrix
 float **opf_ReadDistances(char *fileName, int *n); //read distances from precomputed distances file
 float opf_NormalizedCut( Subgraph *sg );

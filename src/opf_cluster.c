@@ -78,7 +78,7 @@ int main(int argc, char **argv){
 	   classifier, which essentially can propagate the cluster
 	   labels to new nodes in a testing set. */
 
-	if (g->node[0].truelabel!=0){ // labeled training set
+	/*if (g->node[0].truelabel!=0){ // labeled training set
 	  g->nlabels = 0;
 	  for (i = 0; i < g->nnodes; i++){//propagating root labels
 	    if (g->node[i].root==i)
@@ -95,7 +95,7 @@ int main(int argc, char **argv){
 	}else{ // unlabeled training set
 	  for (i = 0; i < g->nnodes; i++)
 	    g->node[i].truelabel = g->node[i].label+1;
-	}
+	}*/
 
 	fprintf(stdout, "\nWriting classifier's model file ..."); fflush(stdout);
 	opf_WriteModelFile(g, "classifier.opf");

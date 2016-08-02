@@ -11,7 +11,7 @@ FLAGS=  -O3 -Wall
 
 INCFLAGS = -I$(INCLUDE) -I$(INCLUDE)/$(UTIL)
 
-all: libOPF opf_split opf_accuracy opf_train opf_classify opf_learn opf_distance opf_info opf_fold opf_merge opf_cluster statistics txt2opf opf2txt opf_check opf_normalize opfknn_train opfknn_classify opf2svm svm2opf
+all: libOPF opf_split opf_accuracy opf_accuracy4label opf_train opf_classify opf_learn opf_distance opf_info opf_fold opf_merge opf_cluster opf_pruning statistics txt2opf opf2txt opf_check opf_normalize opfknn_train opfknn_classify opf2svm svm2opf
 
 libOPF: libOPF-build
 	echo "libOPF.a built..."
@@ -38,6 +38,9 @@ opf_split: libOPF
 
 opf_accuracy: libOPF
 	$(CC) $(FLAGS) $(INCFLAGS) src/opf_accuracy.c  -L./lib -o bin/opf_accuracy -lOPF -lm
+
+opf_accuracy4label: libOPF
+	$(CC) $(FLAGS) $(INCFLAGS) src/opf_accuracy4label.c  -L./lib -o bin/opf_accuracy4label -lOPF -lm
 
 opf_train: libOPF
 	$(CC) $(FLAGS) $(INCFLAGS) src/opf_train.c  -L./lib -o bin/opf_train -lOPF -lm
@@ -89,6 +92,9 @@ opfknn_train: libOPF
 
 opfknn_classify: libOPF
 	$(CC) $(FLAGS) $(INCFLAGS) src/opfknn_classify.c  -L./lib -o bin/opfknn_classify -lOPF -lm
+
+opf_pruning: libOPF
+	$(CC) $(FLAGS) $(INCFLAGS) src/opf_pruning.c  -L./lib -o bin/opf_pruning -lOPF -lm
 
 util: $(SRC)/$(UTIL)/common.c $(SRC)/$(UTIL)/set.c $(SRC)/$(UTIL)/gqueue.c $(SRC)/$(UTIL)/realheap.c $(SRC)/$(UTIL)/sgctree.c $(SRC)/$(UTIL)/subgraph.c
 	$(CC) $(FLAGS) $(INCFLAGS) -c $(SRC)/$(UTIL)/common.c -o $(OBJ)/common.o

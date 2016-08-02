@@ -34,7 +34,7 @@ int main(int argc, char **argv){
 	gettimeofday(&tic,NULL);
 	opf_OPFClassifying(gTrain, gTest); gettimeofday(&toc,NULL);
 	fprintf(stdout, " OK"); fflush(stdout);
-
+	
 	fprintf(stdout, "\nWriting output file ..."); fflush(stdout);
 	sprintf(fileName,"%s.out",argv[1]);
 	f = fopen(fileName,"w");
