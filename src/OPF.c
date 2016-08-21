@@ -1273,47 +1273,47 @@ float opf_Accuracy(Subgraph *sg){
 
 // Compute accuracy for each class and it outputs an array with the values
 float *opf_Accuracy4Label(Subgraph *sg){
-    float *Acc = NULL, **error_matrix = NULL;
-    int i, *nclass = NULL, nlabels = 0;
+	float *Acc = NULL, **error_matrix = NULL;
+	int i, *nclass = NULL, nlabels = 0;
+    
+	error_matrix = (float **)calloc(sg->nlabels+1, sizeof(float *));
+	for(i = 0; i <= sg->nlabels; i++)
+	    error_matrix[i] = (float *)calloc(2, sizeof(float));
+    
+	nclass = AllocIntArray(sg->nlabels+1);
+    
+	for(i = 0; i < sg->nnodes; i++){
+	    nclass[sg->node[i].truelabel]++;
+	}
+    
+	for(i = 0; i < sg->nnodes; i++){
+	    if(sg->node[i].truelabel != sg->node[i].label){
+		error_matrix[sg->node[i].truelabel][1]++;
+		error_matrix[sg->node[i].label][0]++;
+	    }
+	}
+    
+	for(i = 1; i <= sg->nlabels; i++){
+	    if(nclass[i] != 0){
+		error_matrix[i][1] /= (float)nclass[i];
+		error_matrix[i][0] /= (float)(sg->nnodes - nclass[i]);
+		nlabels++;
+	    }
+	}
+    
+       Acc = (float *)calloc(nlabels+1, sizeof(float));
+    
+	for(i = 1; i <= sg->nlabels; i++){
+	    if(nclass[i] != 0)
+		Acc[i] = 1 - (error_matrix[i][0] + error_matrix[i][1])/2;
+	}
+    
+	for(i = 0; i <= sg->nlabels; i++)
+	    free(error_matrix[i]);
+	free(error_matrix);
+	free(nclass);
 
-    error_matrix = (float **)calloc(sg->nlabels+1, sizeof(float *));
-    for(i = 0; i <= sg->nlabels; i++)
-        error_matrix[i] = (float *)calloc(2, sizeof(float));
-
-    nclass = AllocIntArray(sg->nlabels+1);
-
-    for(i = 0; i < sg->nnodes; i++){
-        nclass[sg->node[i].truelabel]++;
-    }
-
-    for(i = 0; i < sg->nnodes; i++){
-        if(sg->node[i].truelabel != sg->node[i].label){
-            error_matrix[sg->node[i].truelabel][1]++;
-            error_matrix[sg->node[i].label][0]++;
-        }
-    }
-
-    for(i = 1; i <= sg->nlabels; i++){
-        if(nclass[i] != 0){
-            error_matrix[i][1] /= (float)nclass[i];
-            error_matrix[i][0] /= (float)(sg->nnodes - nclass[i]);
-            nlabels++;
-        }
-    }
-
-   Acc = (float *)calloc(nlabels+1, sizeof(float));
-
-    for(i = 1; i <= sg->nlabels; i++){
-        if(nclass[i] != 0)
-            Acc[i] = (error_matrix[i][0] + error_matrix[i][1])/nclass[i];
-    }
-
-    for(i = 0; i <= sg->nlabels; i++)
-        free(error_matrix[i]);
-    free(error_matrix);
-    free(nclass);
-
-    return Acc;
+return Acc;
 }
 
 // Compute the confusion matrix
