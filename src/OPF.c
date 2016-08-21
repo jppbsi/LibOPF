@@ -1271,6 +1271,7 @@ float opf_Accuracy(Subgraph *sg){
 	return(Acc);
 }
 
+/*
 // Compute accuracy for each class and it outputs an array with the values
 float *opf_Accuracy4Label(Subgraph *sg){
 	float *Acc = NULL, **error_matrix = NULL;
@@ -1313,7 +1314,41 @@ float *opf_Accuracy4Label(Subgraph *sg){
 	free(error_matrix);
 	free(nclass);
 
-return Acc;
+	return Acc;
+}*/
+
+// Compute accuracy for each class and it outputs an array with the values
+float *opf_Accuracy4Label(Subgraph *sg){
+	float *Acc = NULL, *error = NULL;
+	int i, *nclass = NULL;
+        
+	nclass = AllocIntArray(sg->nlabels+1);
+	error = AllocFloatArray(sg->nlabels+1);
+    
+	for(i = 0; i < sg->nnodes; i++)
+	  nclass[sg->node[i].truelabel]++;
+    
+	for(i = 0; i < sg->nnodes; i++){
+	  if(sg->node[i].truelabel != sg->node[i].label)
+	    error[sg->node[i].truelabel]++;
+	}
+    
+	for(i = 1; i <= sg->nlabels; i++){
+	    if(nclass[i] != 0)
+	      error[i] /= (float)nclass[i];
+	}
+    
+	Acc = (float *)calloc(sg->nlabels+1, sizeof(float));
+    
+	for(i = 1; i <= sg->nlabels; i++){
+	    if(nclass[i] != 0)
+	      Acc[i] = 1 - error[i];
+	}
+    
+	free(error);
+	free(nclass);
+
+	return Acc;
 }
 
 // Compute the confusion matrix
