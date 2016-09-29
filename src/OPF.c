@@ -1640,6 +1640,121 @@ void opf_ElimMaxBelowVolume(Subgraph *sg, int V){
     free(volume);
 }
 
+/* It calculates the purity of a clustering technique */
+double Purity(Subgraph *g){
+  int i, j, ctr;
+  double purity = 0.0, **counter = NULL, max = -9999999999;
+
+  counter = (double **)calloc(g->nlabels+1, sizeof(double *));
+  for (i = 0; i < g->nlabels+1; i++)
+    counter[i] = (double *)calloc(g->nlabels+1, sizeof(double));
+    
+  /* It counts the true labels per cluster: each row contains the number of elements per true label */
+  for(i = 0; i < g->nnodes; i++){
+    ctr = (int)counter[g->node[i].label][g->node[i].truelabel];
+    counter[g->node[i].label][g->node[i].truelabel] = ctr+1;
+  }
+    
+  for(i = 1; i <= g->nlabels; i++){
+    for(j = 1; j <= g->nlabels; j++){
+      if (max < counter[i][j])
+	max = counter[i][j];
+    }
+    purity += max;
+    fprintf(stderr,"\nRow[%d]: %lf", i, max);
+    max = -9999999999;
+  }
+  
+  /* Calculating final purity */
+  purity /= g->nnodes;
+    
+  /* Deallocating memory */
+  for (i = 0; i < g->nlabels+1; i++)
+    free(counter[i]);
+  free(counter);
+    
+  return purity;
+}
+
+/* It calculates the cluster centroids by k-means clustering */
+void kMeans(Subgraph *g, double **mean, int k){
+  int i, j, l, z = 0, nearest_k, total_elements = k, *counter = NULL;
+  float **c = NULL, **c_aux = NULL, *x = NULL;
+  double distance, min_distance, old_error, error = DBL_MAX;
+
+  counter = (int *)calloc(k, sizeof(int));
+  x = (float *)calloc(g->nfeats, sizeof(float));
+  
+  c = (float **)calloc(k, sizeof(float *));
+  c_aux = (float **)calloc(k, sizeof(float *));
+  for (i = 0; i < k; i++){
+    c[i] = (float *)calloc(g->nfeats, sizeof(float));
+    c_aux[i] = (float *)calloc(g->nfeats, sizeof(float));
+  }
+  
+  /* Initializing centers randomly */
+  while(total_elements > 0){
+    i = RandomInteger(0, g->nnodes-1);
+    if (g->node[i].status != NIL){
+      for (j = 0; j < g->nfeats; j++)
+	c[z][j] = g->node[i].feat[j];
+      g->node[i].status = NIL;
+      total_elements--;
+      z++;
+    }
+  }
+  
+  do{
+    old_error = error;
+    error = 0;
+    for (i = 0; i < k; i++)
+      for (j = 0; j < g->nfeats; j++)
+	c_aux[i][j] = 0;
+	
+    /* It associates each node to its nearest center */
+    for (i = 0; i < g->nnodes; i++){
+      for (j = 0; j < g->nfeats; j++){
+	x[j] = g->node[i].feat[j];
+	min_distance = DBL_MAX;
+      }
+      
+      for (l = 0; l < k; l++){
+	distance = opf_EuclDist(x, c[l], g->nfeats);
+	if (distance < min_distance){
+	  min_distance = distance;
+	  nearest_k = l;
+	  g->node[i].label = l + 1;
+	}
+      }
+
+      counter[nearest_k]++; /* It counts the number of samples that have been associated with center nearest_k */
+      for (j = 0; j < g->nfeats; j++)
+	c_aux[nearest_k][j] += g->node[i].feat[j];
+      error += min_distance;
+    }
+
+    /* Updating centers */
+    for (i = 0; i < k; i++){
+      for(j = 0; j < g->nfeats; j++)
+	c[i][j] = c_aux[i][j] / counter[i];
+      counter[i] = 0;
+    }
+  } while(fabs(error-old_error) > 1e-10);
+    
+  for (i = 0; i < k; i++)
+    for (j = 0; j < g->nfeats; j++)
+      mean[i][j] = c[i][j];
+    
+  free(counter);
+  free(x);
+  for(i = 0; i < k; i++){
+    free(c[i]);
+    free(c_aux[i]);
+  }
+  free(c);
+  free(c_aux);
+}
+
 /*------------ Distance functions ------------------------------ */
 
 // Compute Euclidean distance between feature vectors
