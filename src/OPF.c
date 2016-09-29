@@ -613,6 +613,89 @@ void opf_OPFClustering(Subgraph *sg){
     free( pathval );
 }
 
+//Training function: it computes unsupervised training for the
+//pre-computed best k and outputs the prototypes nodes.
+
+Set *opf_OPFClustering4ANN(Subgraph *sg){
+    Set *adj_i,*adj_j, *prototypes = NULL;
+    char insert_i;
+    int i,j;
+    int p, q, l;
+    float tmp,*pathval=NULL;
+    RealHeap *Q=NULL;
+    Set *Saux=NULL;
+
+    //   Add arcs to guarantee symmetry on plateaus
+    for (i=0; i < sg->nnodes; i++){
+        adj_i = sg->node[i].adj;
+        while (adj_i != NULL){
+            j  = adj_i->elem;
+            if (sg->node[i].dens==sg->node[j].dens){
+                // insert i in the adjacency of j if it is not there.
+                adj_j    = sg->node[j].adj;
+                insert_i = 1;
+                while (adj_j != NULL){
+                    if (i == adj_j->elem){
+                        insert_i=0;
+                        break;
+                    }
+                    adj_j=adj_j->next;
+                }
+                if (insert_i)
+                    InsertSet(&(sg->node[j].adj),i);
+            }
+            adj_i=adj_i->next;
+        }
+    }
+
+    // Compute clustering
+
+    pathval = AllocFloatArray(sg->nnodes);
+    Q = CreateRealHeap(sg->nnodes, pathval);
+    SetRemovalPolicyRealHeap(Q, MAXVALUE);
+
+    for (p = 0; p < sg->nnodes; p++){
+        pathval[ p ] = sg->node[ p ].pathval;
+        sg->node[ p ].pred  = NIL;
+        sg->node[ p ].root  = p;
+        InsertRealHeap(Q, p);
+    }
+
+    l = 0; i = 0;
+    while (!IsEmptyRealHeap(Q)){
+        RemoveRealHeap(Q,&p);
+	sg->ordered_list_of_nodes[i]=p; i++;
+
+        if ( sg->node[ p ].pred == NIL ){
+	  InsertSet(&prototypes, p);
+	  pathval[ p ] = sg->node[ p ].dens;
+	  sg->node[p].label=l;
+	  l++;
+        }
+
+        sg->node[ p ].pathval = pathval[ p ];
+        for ( Saux = sg->node[ p ].adj; Saux != NULL; Saux = Saux->next ){
+	  q = Saux->elem;
+	  if ( Q->color[q] != BLACK ) {
+	    tmp = MIN( pathval[ p ], sg->node[ q ].dens);
+	    if ( tmp > pathval[ q ] ){
+	      UpdateRealHeap(Q,q,tmp);
+	      sg->node[ q ].pred  = p;
+	      sg->node[ q ].root  = sg->node[ p ].root;
+	      sg->node[ q ].label = sg->node[ p ].label;
+	    }
+	  }
+        }
+    }
+
+    sg->nlabels = l;
+
+    DestroyRealHeap( &Q );
+    free( pathval );
+    
+    return prototypes;
+}
+
 /*------------ Auxiliary functions ------------------------------ */
 //Resets subgraph fields (pred and arcs)
 void opf_ResetSubgraph(Subgraph *sg){
@@ -1477,7 +1560,7 @@ void opf_BestkMinCut(Subgraph *sg, int kmin, int kmax)
     opf_CreateArcs(sg,sg->bestk);
     opf_PDF(sg);
 
-    printf("best k %d ",sg->bestk);
+    fprintf(stderr, "Best k: %d ",sg->bestk);
 }
 
 

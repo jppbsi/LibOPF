@@ -47,7 +47,8 @@ void opf_OPFClustering4SupervisedLearningForceOnePrototypePerClass(Subgraph *sg)
 void  opf_OPFknnClassify(Subgraph *Train, Subgraph *Test); // OPFknn classification function
 
 /*--------- Unsupervised OPF -------------------------------------*/
-void  opf_OPFClustering(Subgraph *sg); //Training function: it computes unsupervised training for the pre-computed best k.
+void opf_OPFClustering(Subgraph *sg); //Training function: it computes unsupervised training for the pre-computed best k.
+Set *opf_OPFClustering4ANN(Subgraph *sg); //Training function: it computes unsupervised training for the pre-computed best k and outputs the prototypes nodes
 
 /*--------- Semi Supervised OPF with complete graph -----------------------*/
 Subgraph *opf_OPFSemiLearning(Subgraph *sg, Subgraph *nonsg, Subgraph *sgeval);// Semi-supervised learning function
