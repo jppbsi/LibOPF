@@ -49,11 +49,11 @@ int main(int argc, char **argv){
 	
 	/*writing data*/
 	for(i = 0; i < n; i++)	{
-	  if (fscanf(fpIn,"%d",&id) != 1) {
+	  if (fscanf(fpIn,"%ld",&id) != 1) {
 	    fprintf(stderr,"Could not read sample id");
 	    exit(-1);
 	  }
-	  fwrite(&id,sizeof(int),1,fpOut);
+	  fwrite(&id,sizeof(long int),1,fpOut);
 	  
 	  if (fscanf(fpIn,"%d",&label) != 1) {
 	    fprintf(stderr,"Could not read sample label");

@@ -15,8 +15,8 @@ int main(int argc, char **argv){
 		exit(-1);
 	}
 
-	int i;
-	float Acc;
+	int i, j, **CM = NULL;;
+	float Acc, tmp;
 	FILE *f = NULL;
 	char fileName[256];
 
@@ -38,6 +38,22 @@ int main(int argc, char **argv){
 	  }
 	fclose(f);
 	fprintf(stdout, " OK"); fflush(stdout);
+	
+	CM = opf_ConfusionMatrix(g);
+	for(i = 1; i <= g->nlabels; i++){
+		fprintf(stderr,"\n");
+		tmp = 0;
+		for(j = 1; j <= g->nlabels; j++){
+			tmp+=CM[i][j];
+			fprintf(stderr,"CM[%d][%d]: %d	", i, j, CM[i][j]);
+		}
+		fprintf(stderr,"	%.2f%%", (CM[i][i]/tmp)*100);
+	}
+	
+
+	for(i = 0; i < g->nlabels+1; i++)
+		free(CM[i]);
+	free(CM);
 
 	fprintf(stdout, "\nComputing accuracy ..."); fflush(stdout);
 	Acc = opf_Accuracy(g);

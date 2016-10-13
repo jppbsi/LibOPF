@@ -33,7 +33,7 @@ int main(int argc, char **argv){
 	fprintf(fpOut,"\n");
 	/*gravando vetor de caracteristicas*/
 	for(i = 0; i < n; i++){
-		result = fread(&id,sizeof(int),1,fpIn);
+		result = fread(&id,sizeof(long int),1,fpIn);
 		result = fread(&label,sizeof(int),1,fpIn);
 		fprintf(fpOut,"%d %d ",id,label);
 		for(j = 0; j < ndata; j++){
