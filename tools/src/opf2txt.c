@@ -11,7 +11,8 @@ int main(int argc, char **argv){
     fprintf(stderr, "\nProgram to convert files written in the OPF binary format to the OPF ASCII format.");
     
 	FILE *fpIn = NULL,*fpOut = NULL;
-	int n, ndata, nclasses, label, i,j, id;
+	int n, ndata, nclasses, label, i,j;
+	long int id;
 	float aux;
 	size_t result = 0;
 
