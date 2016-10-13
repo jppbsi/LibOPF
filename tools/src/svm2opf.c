@@ -97,7 +97,7 @@ int main(int argc, char** argv){
 	fprintf(stderr, "Creating graph...\n");
 	for(i=0; i<d.ndata; i++){
 		fgets(line, N, file);
-		graph->node[i].position = i;
+		graph->node[i].position = (long int)i;
 		seg = strtok(line, " ");
 		label = atoi(seg);
 		//fprintf(stderr,"%d\n", label);
