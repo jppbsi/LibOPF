@@ -8,7 +8,7 @@ int main(int argc, char **argv){
 		exit(-1);
 	}
 
-    fprintf(stderr, "\nProgram to convert files written in the OPF binary format to the OPF ASCII format.");
+	fprintf(stderr, "\nProgram to convert files written in the OPF binary format to the OPF ASCII format.");
     
 	FILE *fpIn = NULL,*fpOut = NULL;
 	int n, ndata, nclasses, label, i,j;
@@ -21,11 +21,11 @@ int main(int argc, char **argv){
 
 	/*gravando numero de objetos*/
 	result = fread(&n,sizeof(int),1,fpIn);
-    fprintf(fpOut,"%d ",n);
+	fprintf(fpOut,"%d ",n);
 
 	/*gravando numero de classes*/
 	result = fread(&nclasses,sizeof(int),1,fpIn);
-    fprintf(fpOut,"%d ",nclasses);
+	fprintf(fpOut,"%d ",nclasses);
 
 	/*gravando tamanho vetor de caracteristicas*/
 	result = fread(&ndata,sizeof(int),1,fpIn);
@@ -36,7 +36,7 @@ int main(int argc, char **argv){
 	for(i = 0; i < n; i++){
 		result = fread(&id,sizeof(long int),1,fpIn);
 		result = fread(&label,sizeof(int),1,fpIn);
-		fprintf(fpOut,"%d %d ",id,label);
+		fprintf(fpOut,"%ld %d ",id,label);
 		for(j = 0; j < ndata; j++){
 			result = fread(&aux,sizeof(float),1,fpIn);
 			fprintf(fpOut,"%f ",aux);

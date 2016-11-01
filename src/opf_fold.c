@@ -32,7 +32,7 @@ int main(int argc, char **argv){
 	for (i = 0; i < k; i++){
 		fprintf(stdout, "\nWriting fold %d ...",i+1); fflush(stdout);	
 		sprintf(fileName,"fold_%d.dat",i+1);
-        if (op) opf_NormalizeFeatures(fold[i]);
+		if(op) opf_NormalizeFeatures(fold[i]);
 		WriteSubgraph(fold[i],fileName);
 	}
 	fprintf(stdout, " OK\n");

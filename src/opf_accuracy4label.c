@@ -31,29 +31,32 @@ int main(int argc, char **argv){
 		fprintf(stderr,"\nunable to open file %s", argv[2]);
 		exit(-1);
 	}
-	for (i = 0; i < g->nnodes; i++)
-	  if (fscanf(f,"%d",&g->node[i].label) != 1) {
-	    fprintf(stderr,"\nError reading node label");
-	    exit(-1);
-	  }
+	
+	for (i = 0; i < g->nnodes; i++){
+		if (fscanf(f,"%d",&g->node[i].label) != 1){
+			fprintf(stderr,"\nError reading node label");
+			exit(-1);
+		}
+	}
 	fclose(f);
 	fprintf(stdout, " OK"); fflush(stdout);
     
-    fprintf(stdout, "\nComputing accuracy ..."); fflush(stdout);
-    Acc = opf_Accuracy4Label(g);
-    for(i = 1; i <= g->nlabels; i++)
-    	fprintf(stdout, "\nClass %d: %.2f%%", i, Acc[i]*100); fflush(stdout);
+	fprintf(stdout, "\nComputing accuracy ..."); fflush(stdout);
+	Acc = opf_Accuracy4Label(g);
+	for(i = 1; i <= g->nlabels; i++)
+		fprintf(stdout, "\nClass %d: %.2f%%", i, Acc[i]*100);
+	fflush(stdout);
     
 	fprintf(stdout, "\nWriting accuracy in output file ..."); fflush(stdout);
 	sprintf(fileName,"%s.acc",argv[1]);
-    f = fopen(fileName,"a");
-    fprintf(f, "%f", Acc[1]);
-    for(i = 2; i <= g->nlabels; i++){
-        fprintf(f, " %f", Acc[i]);	
-    }
-    fprintf(f, "\n");
-    fclose(f);
-    fprintf(stdout, " OK"); fflush(stdout);
+	f = fopen(fileName,"a");
+	fprintf(f, "%f", Acc[1]);
+	for(i = 2; i <= g->nlabels; i++){
+		fprintf(f, " %f", Acc[i]);	
+		fprintf(f, "\n");
+	}
+	fclose(f);
+	fprintf(stdout, " OK"); fflush(stdout);
        
 	fprintf(stdout, "\nDeallocating memory ..."); fflush(stdout);
 	DestroySubgraph(&g);
