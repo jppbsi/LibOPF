@@ -336,7 +336,7 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax){
 // OPFknn Classification function 
 void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test){
   int i, j, k, l, knn = Train->bestk, *nn = AllocIntArray(knn+1);
-  float weight, dist = -1.0, *d = AllocFloatArray(Train->bestk+1), tmp, cost, dens;
+  float weight = 0, dist = -1.0, *d = AllocFloatArray(Train->bestk+1), tmp, cost, dens;
 		  
   for (i = 0; i < Test->nnodes; i++){
     cost = -FLT_MAX;
@@ -1761,9 +1761,9 @@ double Purity(Subgraph *g){
 
 /* It calculates the cluster centroids by k-means clustering */
 void kMeans(Subgraph *g, double **mean, int k){
-  int i, j, l, z = 0, nearest_k, total_elements = k, *counter = NULL;
+  int i, j, l, z = 0, nearest_k = 0, total_elements = k, *counter = NULL;
   float **c = NULL, **c_aux = NULL, *x = NULL;
-  double distance, min_distance, old_error, error = DBL_MAX;
+  double distance = -1, min_distance = -1, old_error, error = DBL_MAX;
 
   counter = (int *)calloc(k, sizeof(int));
   x = (float *)calloc(g->nfeats, sizeof(float));

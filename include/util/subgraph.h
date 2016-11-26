@@ -15,7 +15,7 @@ typedef struct _snode {
   int   root;    //root node
   int   pred;    //predecessor node
   int   truelabel; //true label if it is known
-  long int   position;  //index in the feature space
+  int   position;  //index in the feature space
   float *feat;    //feature vector
   char  status;  //0 - nothing, 1 - prototype
   char  relevant; //0 - irrelevant, 1 - relevant
