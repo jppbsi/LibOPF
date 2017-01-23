@@ -54,7 +54,7 @@ int main(int argc, char **argv){
 	    fprintf(stderr,"Could not read sample id");
 	    exit(-1);
 	  }
-	  fwrite(&id,sizeof(long int),1,fpOut);
+	  fwrite(&id,sizeof(int),1,fpOut);
 	  
 	  if (fscanf(fpIn,"%d",&label) != 1) {
 	    fprintf(stderr,"Could not read sample label");
