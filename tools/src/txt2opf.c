@@ -16,7 +16,7 @@ int main(int argc, char **argv){
 
 	FILE *fpIn = NULL,*fpOut = NULL;
 	int n, nfeats, nclasses, i,j,label;
-	long int id;
+	int id;
 	float aux;
 
 	fpIn = fopen(argv[1],"r");
@@ -50,7 +50,7 @@ int main(int argc, char **argv){
 	
 	/*writing data*/
 	for(i = 0; i < n; i++)	{
-	  if (fscanf(fpIn,"%ld",&id) != 1) {
+	  if (fscanf(fpIn,"%d",&id) != 1) {
 	    fprintf(stderr,"Could not read sample id");
 	    exit(-1);
 	  }
