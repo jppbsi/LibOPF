@@ -1,10 +1,11 @@
 #include "OPF.h"
 
-int main(int argc, char **argv){
-  int i,n,op;
-  float value;
-  char fileName[256];
-  FILE *f = NULL;
+int main(int argc, char **argv)
+{
+	int i, n, op;
+	float value;
+	char fileName[256];
+	FILE *f = NULL;
 
 	fprintf(stdout, "\nProgram that computes clusters by OPF\n");
 	fprintf(stdout, "\nIf you have any problem, please contact: ");
@@ -13,7 +14,8 @@ int main(int argc, char **argv){
 	fprintf(stdout, "\nLibOPF version 2.0 (2009)\n");
 	fprintf(stdout, "\n");
 
-	if((argc != 6) && (argc != 5)){
+	if ((argc != 6) && (argc != 5))
+	{
 		fprintf(stderr, "\nusage opf_cluster <P1> <P2> <P3> <P4> <P5> <P6>");
 		fprintf(stderr, "\nP1: unlabeled data set in the OPF file format");
 		fprintf(stderr, "\nP2: kmax(maximum degree for the knn graph)");
@@ -23,51 +25,55 @@ int main(int argc, char **argv){
 		exit(-1);
 	}
 
-	if(argc == 6) opf_PrecomputedDistance = 1;
+	if (argc == 6)
+		opf_PrecomputedDistance = 1;
 	fprintf(stdout, "\nReading data file ...");
 	Subgraph *g = ReadSubgraph(argv[1]);
 
-	if(opf_PrecomputedDistance){
-	  opf_DistanceValue = opf_ReadDistances(argv[5], &n);
+	if (opf_PrecomputedDistance)
+	{
+		opf_DistanceValue = opf_ReadDistances(argv[5], &n);
 	}
 
 	op = atoi(argv[3]);
 
-	opf_BestkMinCut(g,1,atoi(argv[2])); //default kmin = 1
+	opf_BestkMinCut(g, 1, atoi(argv[2])); //default kmin = 1
 
 	value = atof(argv[4]);
-	if ((value < 1)&&(value>0)){
-	  fprintf(stdout, "\n\n Filtering clusters ... ");
-	  switch(op){
-	  case 0:
-	    fprintf(stdout, "\n by dome height ... ");
-	    float Hmax=0;
-	    for (i=0; i < g->nnodes; i++)
-	      if (g->node[i].dens > Hmax)
-		Hmax = g->node[i].dens;
-	    opf_ElimMaxBelowH(g, value*Hmax);
-	    break;
-	  case 1:
-	    fprintf(stdout, "\n by area ... ");
-	    opf_ElimMaxBelowArea(g, (int)(value*g->nnodes));
-	    break;
-	  case 2:
-	    fprintf(stdout, "\n by volume ... ");
-	    double Vmax=0;
-	    for (i=0; i < g->nnodes; i++)
-	      Vmax += g->node[i].dens;
-	    opf_ElimMaxBelowVolume(g, (int)(value*Vmax/g->nnodes));
-	    break;
-	  default:
-	    fprintf(stderr, "\nInvalid option for parameter P3 ... ");
-	    exit(-1);
-	    break;
-	  }
+	if ((value < 1) && (value > 0))
+	{
+		fprintf(stdout, "\n\n Filtering clusters ... ");
+		switch (op)
+		{
+		case 0:
+			fprintf(stdout, "\n by dome height ... ");
+			float Hmax = 0;
+			for (i = 0; i < g->nnodes; i++)
+				if (g->node[i].dens > Hmax)
+					Hmax = g->node[i].dens;
+			opf_ElimMaxBelowH(g, value * Hmax);
+			break;
+		case 1:
+			fprintf(stdout, "\n by area ... ");
+			opf_ElimMaxBelowArea(g, (int)(value * g->nnodes));
+			break;
+		case 2:
+			fprintf(stdout, "\n by volume ... ");
+			double Vmax = 0;
+			for (i = 0; i < g->nnodes; i++)
+				Vmax += g->node[i].dens;
+			opf_ElimMaxBelowVolume(g, (int)(value * Vmax / g->nnodes));
+			break;
+		default:
+			fprintf(stderr, "\nInvalid option for parameter P3 ... ");
+			exit(-1);
+			break;
+		}
 	}
 
 	fprintf(stdout, "\n\nClustering by OPF ");
 	opf_OPFClustering(g);
-	printf("num of clusters %d\n",g->nlabels);
+	printf("num of clusters %d\n", g->nlabels);
 
 	/* If the training set has true labels, then create a
 	   classifier by propagating the true label of each root to
@@ -97,24 +103,29 @@ int main(int argc, char **argv){
 	    g->node[i].truelabel = g->node[i].label+1;
 	}*/
 
-	fprintf(stdout, "\nWriting classifier's model file ..."); fflush(stdout);
+	fprintf(stdout, "\nWriting classifier's model file ...");
+	fflush(stdout);
 	opf_WriteModelFile(g, "classifier.opf");
-	fprintf(stdout, " OK"); fflush(stdout);
+	fprintf(stdout, " OK");
+	fflush(stdout);
 
-	fprintf(stdout, "\nWriting output file ..."); fflush(stdout);
-	sprintf(fileName,"%s.out",argv[1]);
-	f = fopen(fileName,"w");
+	fprintf(stdout, "\nWriting output file ...");
+	fflush(stdout);
+	sprintf(fileName, "%s.out", argv[1]);
+	f = fopen(fileName, "w");
 	for (i = 0; i < g->nnodes; i++)
-		fprintf(f,"%d\n",g->node[i].label);
+		fprintf(f, "%d\n", g->node[i].label);
 	fclose(f);
-	fprintf(stdout, " OK"); fflush(stdout);
+	fprintf(stdout, " OK");
+	fflush(stdout);
 
 	fprintf(stdout, "\n\nDeallocating memory ...\n");
 	DestroySubgraph(&g);
-	if(opf_PrecomputedDistance){
-	  for (i = 0; i < n; i++)
-	    free(opf_DistanceValue[i]);
-	  free(opf_DistanceValue);
+	if (opf_PrecomputedDistance)
+	{
+		for (i = 0; i < n; i++)
+			free(opf_DistanceValue[i]);
+		free(opf_DistanceValue);
 	}
 
 	return 0;

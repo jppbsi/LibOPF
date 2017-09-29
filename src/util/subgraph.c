@@ -27,55 +27,61 @@
 
 /*----------- Constructor and destructor ------------------------*/
 // Allocate nodes without features
-Subgraph *CreateSubgraph(int nnodes){
-  Subgraph *sg=(Subgraph *)calloc(1,sizeof(Subgraph));
+Subgraph *CreateSubgraph(int nnodes)
+{
+  Subgraph *sg = (Subgraph *)calloc(1, sizeof(Subgraph));
   int i;
 
   sg->nnodes = nnodes;
-  sg->node   = (SNode *)calloc(nnodes,sizeof(SNode));
-  sg->ordered_list_of_nodes = (int *) calloc(nnodes,sizeof(int));
+  sg->node = (SNode *)calloc(nnodes, sizeof(SNode));
+  sg->ordered_list_of_nodes = (int *)calloc(nnodes, sizeof(int));
 
-  if (sg->node == NULL){
-    Error("Cannot allocate nodes","CreateSubgraph");
+  if (sg->node == NULL)
+  {
+    Error("Cannot allocate nodes", "CreateSubgraph");
   }
-  
+
   sg->bestk = 0;
 
-  for (i=0; i < sg->nnodes; i++){
-    sg->node[i].feat   = NULL;
-	sg->node[i].relevant = 0;
-	sg->node[i].dens = 0.0;
+  for (i = 0; i < sg->nnodes; i++)
+  {
+    sg->node[i].feat = NULL;
+    sg->node[i].relevant = 0;
+    sg->node[i].dens = 0.0;
   }
 
-  return(sg);
+  return (sg);
 }
 
 // Deallocate memory for subgraph
-void DestroySubgraph(Subgraph **sg){
-    int i;
+void DestroySubgraph(Subgraph **sg)
+{
+  int i;
 
-    if ((*sg)!=NULL)
+  if ((*sg) != NULL)
+  {
+    for (i = 0; i < (*sg)->nnodes; i++)
     {
-        for (i=0; i < (*sg)->nnodes; i++)
-        {
-            if ((*sg)->node[i].feat != NULL)
-                free((*sg)->node[i].feat);
-            if ((*sg)->node[i].adj != NULL)
-                DestroySet(&(*sg)->node[i].adj);
-        }
-        free((*sg)->node);
-        free((*sg)->ordered_list_of_nodes);
-        free((*sg));
-        *sg = NULL;
+      if ((*sg)->node[i].feat != NULL)
+        free((*sg)->node[i].feat);
+      if ((*sg)->node[i].adj != NULL)
+        DestroySet(&(*sg)->node[i].adj);
     }
+    free((*sg)->node);
+    free((*sg)->ordered_list_of_nodes);
+    free((*sg));
+    *sg = NULL;
+  }
 }
 
 //write subgraph to disk
-void WriteSubgraph(Subgraph *g, char *file){
+void WriteSubgraph(Subgraph *g, char *file)
+{
   FILE *fp = NULL;
   int i, j;
 
-  if(g != NULL){
+  if (g != NULL)
+  {
     fp = fopen(file, "wb");
     fwrite(&g->nnodes, sizeof(int), 1, fp);
     fwrite(&g->nlabels, sizeof(int), 1, fp);
@@ -83,49 +89,53 @@ void WriteSubgraph(Subgraph *g, char *file){
     fprintf(stderr, "Samples: %d\nLabels: %d\nFeatures: %d", g->nnodes, g->nlabels, g->nfeats);
 
     /*writing position(id), label and features*/
-    for (i = 0; i < g->nnodes; i++){
+    for (i = 0; i < g->nnodes; i++)
+    {
       fwrite(&g->node[i].position, sizeof(int), 1, fp);
       fwrite(&g->node[i].truelabel, sizeof(int), 1, fp);
       for (j = 0; j < g->nfeats; j++)
-	fwrite(&g->node[i].feat[j], sizeof(float), 1, fp);
+        fwrite(&g->node[i].feat[j], sizeof(float), 1, fp);
     }
     fclose(fp);
   }
 }
 
 //read subgraph from opf format file
-Subgraph *ReadSubgraph(char *file){
+Subgraph *ReadSubgraph(char *file)
+{
   Subgraph *g = NULL;
   FILE *fp = NULL;
   int nnodes, i, j;
   char msg[256];
 
-  if((fp = fopen(file, "rb")) == NULL){
+  if ((fp = fopen(file, "rb")) == NULL)
+  {
     sprintf(msg, "%s%s", "Unable to open file ", file);
-    Error(msg,"ReadSubGraph");
+    Error(msg, "ReadSubGraph");
   }
 
   /*reading # of nodes, classes and feats*/
-  if (fread(&nnodes, sizeof(int), 1, fp) != 1) 
-    Error("Could not read the number of nodes","ReadSubGraph");
+  if (fread(&nnodes, sizeof(int), 1, fp) != 1)
+    Error("Could not read the number of nodes", "ReadSubGraph");
   g = CreateSubgraph(nnodes);
   if (fread(&g->nlabels, sizeof(int), 1, fp) != 1)
-    Error("Could not read the number of labels","ReadSubGraph");
-  if (fread(&g->nfeats, sizeof(int), 1, fp) != 1) 
-    Error("Could not read the number of features","ReadSubGraph");
-    
+    Error("Could not read the number of labels", "ReadSubGraph");
+  if (fread(&g->nfeats, sizeof(int), 1, fp) != 1)
+    Error("Could not read the number of features", "ReadSubGraph");
+
   /*reading features*/
-  for (i = 0; i < g->nnodes; i++){
+  for (i = 0; i < g->nnodes; i++)
+  {
     g->node[i].feat = AllocFloatArray(g->nfeats);
-    if (fread(&g->node[i].position, sizeof(int), 1, fp) != 1) 
-      Error("Could not read node position","ReadSubGraph");      
-    if(fread(&g->node[i].truelabel, sizeof(int), 1, fp) != 1) 
-      Error("Could not read node true label","ReadSubGraph");
+    if (fread(&g->node[i].position, sizeof(int), 1, fp) != 1)
+      Error("Could not read node position", "ReadSubGraph");
+    if (fread(&g->node[i].truelabel, sizeof(int), 1, fp) != 1)
+      Error("Could not read node true label", "ReadSubGraph");
 
     for (j = 0; j < g->nfeats; j++)
-      if(fread(&g->node[i].feat[j], sizeof(float), 1, fp) != 1) 
-	Error("Could not read node features","ReadSubGraph");	
-   }
+      if (fread(&g->node[i].feat[j], sizeof(float), 1, fp) != 1)
+        Error("Could not read node features", "ReadSubGraph");
+  }
 
   fclose(fp);
 
@@ -133,11 +143,13 @@ Subgraph *ReadSubgraph(char *file){
 }
 
 // Copy subgraph (does not copy Arcs)
-Subgraph *CopySubgraph(Subgraph *g){
+Subgraph *CopySubgraph(Subgraph *g)
+{
   Subgraph *clone = NULL;
   int i;
 
-  if(g != NULL){
+  if (g != NULL)
+  {
     clone = CreateSubgraph(g->nnodes);
 
     clone->bestk = g->bestk;
@@ -148,41 +160,44 @@ Subgraph *CopySubgraph(Subgraph *g){
     clone->maxdens = g->maxdens;
     clone->K = g->K;
 
-    for(i=0; i< g->nnodes; i++){
+    for (i = 0; i < g->nnodes; i++)
+    {
       CopySNode(&clone->node[i], &g->node[i], g->nfeats);
       clone->ordered_list_of_nodes[i] = g->ordered_list_of_nodes[i];
     }
 
     return clone;
-  }else return NULL;
+  }
+  else
+    return NULL;
 }
 
 //Copy nodes
-void CopySNode(SNode *dest, SNode *src, int nfeats){
-	dest->feat = AllocFloatArray(nfeats);
-	memcpy(dest->feat, src->feat, nfeats*sizeof(float));
-	dest->pathval = src->pathval;
-	dest->dens = src->dens;
-	dest->label  = src->label;
-	dest->root = src->root;
-	dest->pred  = src->pred;
-	dest->truelabel = src->truelabel;
-	dest->position = src->position;
-	dest->status = src->status;
-	dest->relevant = src->relevant;
-	dest->radius = src->radius;
-	dest->nplatadj = src->nplatadj;
+void CopySNode(SNode *dest, SNode *src, int nfeats)
+{
+  dest->feat = AllocFloatArray(nfeats);
+  memcpy(dest->feat, src->feat, nfeats * sizeof(float));
+  dest->pathval = src->pathval;
+  dest->dens = src->dens;
+  dest->label = src->label;
+  dest->root = src->root;
+  dest->pred = src->pred;
+  dest->truelabel = src->truelabel;
+  dest->position = src->position;
+  dest->status = src->status;
+  dest->relevant = src->relevant;
+  dest->radius = src->radius;
+  dest->nplatadj = src->nplatadj;
 
-    dest->adj = CloneSet(src->adj);
+  dest->adj = CloneSet(src->adj);
 }
-
 
 //Swap nodes
-void SwapSNode(SNode *a, SNode *b){
-	SNode tmp;
+void SwapSNode(SNode *a, SNode *b)
+{
+  SNode tmp;
 
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
+  tmp = *a;
+  *a = *b;
+  *b = tmp;
 }
-

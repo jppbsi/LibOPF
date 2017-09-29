@@ -1,5 +1,5 @@
 /*
-  Copyright (C) <2003> <Alexandre Xavier Falcão>
+  Copyright (C) <2003> <Alexandre Xavier Falcï¿½o>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
   please see full copyright in COPYING file.
   -------------------------------------------------------------------------
-  written by A.X. Falcão <afalcao@ic.unicamp.br>, May 13th 2007
+  written by A.X. Falcï¿½o <afalcao@ic.unicamp.br>, May 13th 2007
 
   This program is a collection of functions to create, destroy, and
   manipulate a priority queue.
@@ -58,37 +58,36 @@
 
 #include "gqueue.h"
 
-
 GQueue *CreateGQueue(int nbuckets, int nelems, int *value)
 {
-    GQueue *Q=NULL;
+    GQueue *Q = NULL;
 
-    Q = (GQueue *) malloc(1*sizeof(GQueue));
+    Q = (GQueue *)malloc(1 * sizeof(GQueue));
 
     if (Q != NULL)
     {
-        Q->C.first = (int *)malloc((nbuckets+1) * sizeof(int));
-        Q->C.last  = (int *)malloc((nbuckets+1) * sizeof(int));
+        Q->C.first = (int *)malloc((nbuckets + 1) * sizeof(int));
+        Q->C.last = (int *)malloc((nbuckets + 1) * sizeof(int));
         Q->C.nbuckets = nbuckets;
-        if ( (Q->C.first != NULL) && (Q->C.last != NULL) )
+        if ((Q->C.first != NULL) && (Q->C.last != NULL))
         {
-            Q->L.elem = (GQNode *)malloc(nelems*sizeof(GQNode));
+            Q->L.elem = (GQNode *)malloc(nelems * sizeof(GQNode));
             Q->L.nelems = nelems;
-            Q->L.value   = value;
+            Q->L.value = value;
             if (Q->L.elem != NULL)
             {
                 ResetGQueue(Q);
             }
             else
-                Error(MSG1,"CreateGQueue");
+                Error(MSG1, "CreateGQueue");
         }
         else
-            Error(MSG1,"CreateGQueue");
+            Error(MSG1, "CreateGQueue");
     }
     else
-        Error(MSG1,"CreateGQueue");
+        Error(MSG1, "CreateGQueue");
 
-    return(Q);
+    return (Q);
 }
 
 void ResetGQueue(GQueue *Q)
@@ -97,17 +96,16 @@ void ResetGQueue(GQueue *Q)
 
     Q->C.minvalue = INT_MAX;
     Q->C.maxvalue = INT_MIN;
-    SetTieBreak(Q,FIFOBREAK);
-    SetRemovalPolicy(Q,MINVALUE);
-    for (i=0; i < Q->C.nbuckets+1; i++)
-        Q->C.first[i]=Q->C.last[i]=NIL;
+    SetTieBreak(Q, FIFOBREAK);
+    SetRemovalPolicy(Q, MINVALUE);
+    for (i = 0; i < Q->C.nbuckets + 1; i++)
+        Q->C.first[i] = Q->C.last[i] = NIL;
 
-    for (i=0; i < Q->L.nelems; i++)
+    for (i = 0; i < Q->L.nelems; i++)
     {
-        Q->L.elem[i].next =  Q->L.elem[i].prev = NIL;
+        Q->L.elem[i].next = Q->L.elem[i].prev = NIL;
         Q->L.elem[i].color = WHITE;
     }
-
 }
 
 void DestroyGQueue(GQueue **Q)
@@ -117,9 +115,12 @@ void DestroyGQueue(GQueue **Q)
     aux = *Q;
     if (aux != NULL)
     {
-        if (aux->C.first != NULL) free(aux->C.first);
-        if (aux->C.last  != NULL) free(aux->C.last);
-        if (aux->L.elem  != NULL) free(aux->L.elem);
+        if (aux->C.first != NULL)
+            free(aux->C.first);
+        if (aux->C.last != NULL)
+            free(aux->C.last);
+        if (aux->L.elem != NULL)
+            free(aux->L.elem);
         free(aux);
         *Q = NULL;
     }
@@ -127,66 +128,65 @@ void DestroyGQueue(GQueue **Q)
 
 GQueue *GrowGQueue(GQueue **Q, int nbuckets)
 {
-    GQueue *Q1=CreateGQueue(nbuckets,(*Q)->L.nelems,(*Q)->L.value);
-    int i,bucket;
+    GQueue *Q1 = CreateGQueue(nbuckets, (*Q)->L.nelems, (*Q)->L.value);
+    int i, bucket;
 
-    Q1->C.minvalue  = (*Q)->C.minvalue;
-    Q1->C.maxvalue  = (*Q)->C.maxvalue;
+    Q1->C.minvalue = (*Q)->C.minvalue;
+    Q1->C.maxvalue = (*Q)->C.maxvalue;
     Q1->C.tiebreak = (*Q)->C.tiebreak;
     Q1->C.removal_policy = (*Q)->C.removal_policy;
-    for (i=0; i<(*Q)->C.nbuckets; i++)
-        if ((*Q)->C.first[i]!=NIL)
+    for (i = 0; i < (*Q)->C.nbuckets; i++)
+        if ((*Q)->C.first[i] != NIL)
         {
-            bucket = (*Q)->L.value[(*Q)->C.first[i]]%Q1->C.nbuckets;
+            bucket = (*Q)->L.value[(*Q)->C.first[i]] % Q1->C.nbuckets;
             Q1->C.first[bucket] = (*Q)->C.first[i];
-            Q1->C.last[bucket]  = (*Q)->C.last[i];
+            Q1->C.last[bucket] = (*Q)->C.last[i];
         }
-    if ((*Q)->C.first[(*Q)->C.nbuckets]!=NIL)
+    if ((*Q)->C.first[(*Q)->C.nbuckets] != NIL)
     {
         bucket = Q1->C.nbuckets;
         Q1->C.first[bucket] = (*Q)->C.first[(*Q)->C.nbuckets];
-        Q1->C.last[bucket]  = (*Q)->C.last[(*Q)->C.nbuckets];
+        Q1->C.last[bucket] = (*Q)->C.last[(*Q)->C.nbuckets];
     }
 
-    for (i=0; i < (*Q)->L.nelems; i++)
-        Q1->L.elem[i]  = (*Q)->L.elem[i];
+    for (i = 0; i < (*Q)->L.nelems; i++)
+        Q1->L.elem[i] = (*Q)->L.elem[i];
 
     DestroyGQueue(Q);
-    return(Q1);
+    return (Q1);
 }
-
 
 void InsertGQueue(GQueue **Q, int elem)
 {
-    int bucket,minvalue=(*Q)->C.minvalue,maxvalue=(*Q)->C.maxvalue;
+    int bucket, minvalue = (*Q)->C.minvalue, maxvalue = (*Q)->C.maxvalue;
 
-    if (((*Q)->L.value[elem]==INT_MAX)||((*Q)->L.value[elem]==INT_MIN))
-        bucket=(*Q)->C.nbuckets;
+    if (((*Q)->L.value[elem] == INT_MAX) || ((*Q)->L.value[elem] == INT_MIN))
+        bucket = (*Q)->C.nbuckets;
     else
     {
         if ((*Q)->L.value[elem] < minvalue)
             minvalue = (*Q)->L.value[elem];
         if ((*Q)->L.value[elem] > maxvalue)
             maxvalue = (*Q)->L.value[elem];
-        if ((maxvalue-minvalue) > ((*Q)->C.nbuckets-1))
+        if ((maxvalue - minvalue) > ((*Q)->C.nbuckets - 1))
         {
-            (*Q) = GrowGQueue(Q,2*(maxvalue-minvalue)+1);
-            fprintf(stdout,"Warning: Doubling queue size\n");
+            (*Q) = GrowGQueue(Q, 2 * (maxvalue - minvalue) + 1);
+            fprintf(stdout, "Warning: Doubling queue size\n");
         }
-        if ((*Q)->C.removal_policy==MINVALUE)
+        if ((*Q)->C.removal_policy == MINVALUE)
         {
-            bucket=(*Q)->L.value[elem]%(*Q)->C.nbuckets;
+            bucket = (*Q)->L.value[elem] % (*Q)->C.nbuckets;
         }
         else
         {
-            bucket=(*Q)->C.nbuckets-1-((*Q)->L.value[elem]%(*Q)->C.nbuckets);
+            bucket = (*Q)->C.nbuckets - 1 - ((*Q)->L.value[elem] % (*Q)->C.nbuckets);
         }
         (*Q)->C.minvalue = minvalue;
         (*Q)->C.maxvalue = maxvalue;
     }
     if ((*Q)->C.first[bucket] == NIL)
     {
-        (*Q)->C.first[bucket]   = elem;
+        (*Q)->C.first[bucket] = elem;
         (*Q)->L.elem[elem].prev = NIL;
     }
     else
@@ -195,20 +195,20 @@ void InsertGQueue(GQueue **Q, int elem)
         (*Q)->L.elem[elem].prev = (*Q)->C.last[bucket];
     }
 
-    (*Q)->C.last[bucket]     = elem;
-    (*Q)->L.elem[elem].next  = NIL;
+    (*Q)->C.last[bucket] = elem;
+    (*Q)->L.elem[elem].next = NIL;
     (*Q)->L.elem[elem].color = GRAY;
 }
 
 int RemoveGQueue(GQueue *Q)
 {
-    int elem=NIL, next, prev;
+    int elem = NIL, next, prev;
     int last, current;
 
-    if (Q->C.removal_policy==MINVALUE)
-        current=Q->C.minvalue%Q->C.nbuckets;
+    if (Q->C.removal_policy == MINVALUE)
+        current = Q->C.minvalue % Q->C.nbuckets;
     else
-        current=Q->C.nbuckets-1-(Q->C.maxvalue%Q->C.nbuckets);
+        current = Q->C.nbuckets - 1 - (Q->C.maxvalue % Q->C.nbuckets);
 
     /** moves to next element **/
 
@@ -225,7 +225,7 @@ int RemoveGQueue(GQueue *Q)
 
         if (Q->C.first[current] != NIL)
         {
-            if (Q->C.removal_policy==MINVALUE)
+            if (Q->C.removal_policy == MINVALUE)
                 Q->C.minvalue = Q->L.value[Q->C.first[current]];
             else
                 Q->C.maxvalue = Q->L.value[Q->C.first[current]];
@@ -235,14 +235,14 @@ int RemoveGQueue(GQueue *Q)
             if (Q->C.first[Q->C.nbuckets] != NIL)
             {
                 current = Q->C.nbuckets;
-                if (Q->C.removal_policy==MINVALUE)
+                if (Q->C.removal_policy == MINVALUE)
                     Q->C.minvalue = Q->L.value[Q->C.first[current]];
                 else
                     Q->C.maxvalue = Q->L.value[Q->C.first[current]];
             }
             else
             {
-                Error("GQueue is empty\n","RemoveGQueue");
+                Error("GQueue is empty\n", "RemoveGQueue");
             }
         }
     }
@@ -251,23 +251,23 @@ int RemoveGQueue(GQueue *Q)
     {
         elem = Q->C.last[current];
         prev = Q->L.elem[elem].prev;
-        if (prev == NIL)           /* there was a single element in the list */
+        if (prev == NIL) /* there was a single element in the list */
         {
-            Q->C.last[current] = Q->C.first[current]  = NIL;
+            Q->C.last[current] = Q->C.first[current] = NIL;
         }
         else
         {
-            Q->C.last[current]   = prev;
+            Q->C.last[current] = prev;
             Q->L.elem[prev].next = NIL;
         }
     }
-    else   /* Assume FIFO policy for breaking ties */
+    else /* Assume FIFO policy for breaking ties */
     {
         elem = Q->C.first[current];
         next = Q->L.elem[elem].next;
-        if (next == NIL)           /* there was a single element in the list */
+        if (next == NIL) /* there was a single element in the list */
         {
-            Q->C.first[current] = Q->C.last[current]  = NIL;
+            Q->C.first[current] = Q->C.last[current] = NIL;
         }
         else
         {
@@ -283,16 +283,16 @@ int RemoveGQueue(GQueue *Q)
 
 void RemoveGQueueElem(GQueue *Q, int elem)
 {
-    int prev,next,bucket;
+    int prev, next, bucket;
 
-    if ((Q->L.value[elem] == INT_MAX)||(Q->L.value[elem] == INT_MIN))
+    if ((Q->L.value[elem] == INT_MAX) || (Q->L.value[elem] == INT_MIN))
         bucket = Q->C.nbuckets;
     else
     {
         if (Q->C.removal_policy == MINVALUE)
-            bucket = Q->L.value[elem]%Q->C.nbuckets;
+            bucket = Q->L.value[elem] % Q->C.nbuckets;
         else
-            bucket = Q->C.nbuckets-1-(Q->L.value[elem]%Q->C.nbuckets);
+            bucket = Q->C.nbuckets - 1 - (Q->L.value[elem] % Q->C.nbuckets);
     }
 
     prev = Q->L.elem[elem].prev;
@@ -307,7 +307,7 @@ void RemoveGQueueElem(GQueue *Q, int elem)
         else
             Q->L.elem[next].prev = NIL;
     }
-    else    /* elem is in the middle or it is the last */
+    else /* elem is in the middle or it is the last */
     {
         Q->L.elem[prev].next = next;
         if (next == NIL) /* if it is the last */
@@ -317,7 +317,6 @@ void RemoveGQueueElem(GQueue *Q, int elem)
     }
 
     Q->L.elem[elem].color = BLACK;
-
 }
 
 void UpdateGQueue(GQueue **Q, int elem, int newvalue)
@@ -329,12 +328,12 @@ void UpdateGQueue(GQueue **Q, int elem, int newvalue)
 
 int EmptyGQueue(GQueue *Q)
 {
-    int last,current;
+    int last, current;
 
     if (Q->C.removal_policy == MINVALUE)
-        current=Q->C.minvalue%Q->C.nbuckets;
+        current = Q->C.minvalue % Q->C.nbuckets;
     else
-        current=Q->C.nbuckets - 1 - (Q->C.maxvalue%Q->C.nbuckets);
+        current = Q->C.nbuckets - 1 - (Q->C.maxvalue % Q->C.nbuckets);
 
     if (Q->C.first[current] != NIL)
         return 0;
@@ -352,17 +351,9 @@ int EmptyGQueue(GQueue *Q)
     {
         if (Q->C.first[Q->C.nbuckets] == NIL)
         {
-            return(1);
+            return (1);
         }
     }
 
     return (0);
 }
-
-
-
-
-
-
-
-
