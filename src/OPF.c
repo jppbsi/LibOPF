@@ -378,7 +378,7 @@ int opf_OPFknnLearning(Subgraph *Train, Subgraph *Eval, int kmax)
 void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test)
 {
   int i, j, k, l, knn = Train->bestk, *nn = AllocIntArray(knn + 1);
-  float weight = 0, dist = -1.0, *d = AllocFloatArray(Train->bestk + 1), tmp, cost, dens;
+  float dist = -1.0, *d = AllocFloatArray(Train->bestk + 1), tmp, cost, dens;
 
   for (i = 0; i < Test->nnodes; i++)
   {
@@ -413,16 +413,14 @@ void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test)
 
     /* computing the density of testing sample i */
     dens = 0;
-    for (l = 0; l < knn; l++)
-    {
-      if (!opf_PrecomputedDistance)
-        weight = opf_ArcWeight(Test->node[i].feat, Train->node[nn[l]].feat, Train->nfeats);
-      else
-        weight = opf_DistanceValue[Test->node[i].position][Train->node[nn[l]].position];
-      dens += exp(-dist / Train->K);
+    for (l = 0; l < knn; l++){
+      dens += exp(-d[l] / Train->K);
     }
     dens /= knn;
-
+    
+    /* scaling density */
+    dens = ((float)(opf_MAXDENS - 1) * (dens - Train->mindens) / (float)(Train->maxdens - Train->mindens)) + 1.0;
+    
     for (l = 0; l < knn; l++)
     {
       if (d[l] != INT_MAX)
@@ -431,7 +429,7 @@ void opf_OPFknnClassify(Subgraph *Train, Subgraph *Test)
         if (tmp > cost)
         {
           cost = tmp;
-          Test->node[i].label = Train->node[nn[l]].truelabel;
+          Test->node[i].label = Train->node[nn[l]].label;
         }
       }
     }
