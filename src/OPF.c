@@ -1102,6 +1102,20 @@ Subgraph *opf_ReadModelFile(char *file)
   return g;
 }
 
+//write output file from opf subgraph to disk
+void opf_WriteOutputFile(Subgraph *g, char *file)
+{
+  FILE *fp = NULL;
+  int i;
+
+  fp = fopen(file, "wb");
+
+  for (i = 0; i < g->nnodes; i++)
+	  fprintf(fp, "%d\n", g->node[i].label);
+
+	fclose(fp);
+}
+
 //normalize features
 void opf_NormalizeFeatures(Subgraph *sg)
 {

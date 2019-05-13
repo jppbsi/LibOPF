@@ -62,6 +62,7 @@ void opf_RemoveIrrelevantNodes(Subgraph **sg); //Remove irrelevant nodes
 void opf_MarkNodes(Subgraph *g, int i); //mark nodes and the whole path as relevants
 void opf_WriteModelFile(Subgraph *g, char *file); //write model file to disk
 Subgraph *opf_ReadModelFile(char *file); //read subgraph from opf model file
+void opf_WriteOutputFile(Subgraph *g, char *file); //write output file from opf subgraph to disk
 void opf_NormalizeFeatures(Subgraph *sg); //normalize features
 void opf_MSTPrototypes(Subgraph *sg); //Find prototypes by the MST approach
 Subgraph **opf_kFoldSubgraph(Subgraph *sg, int k); //It creates k folds for cross validation

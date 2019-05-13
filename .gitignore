@@ -1,3 +1,7 @@
+# Mac OS files
+**/*.DS_Store
+.vscode
+
 # Object files
 *.o
 *.ko

@@ -57,10 +57,7 @@ int main(int argc, char **argv)
 	fprintf(stdout, "\nWriting output file ...");
 	fflush(stdout);
 	sprintf(fileName, "%s.out", argv[1]);
-	f = fopen(fileName, "w");
-	for (i = 0; i < Train->nnodes; i++)
-		fprintf(f, "%d\n", Train->node[i].label);
-	fclose(f);
+	opf_WriteOutputFile(Train, fileName);
 	fprintf(stdout, " OK");
 	fflush(stdout);
 
