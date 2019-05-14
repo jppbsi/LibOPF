@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	/*writing the number of samples*/
 	if (fscanf(fpIn, "%d", &n) != 1)
 	{
-		fprintf(stderr, "Could not read number of samples");
+		fprintf(stderr, "\n Could not read number of samples");
 		exit(-1);
 	}
 	fprintf(stderr, "\n number of samples: %d", n);
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	/*writing the number of classes*/
 	if (fscanf(fpIn, "%d", &nclasses) != 1)
 	{
-		fprintf(stderr, "Could not read number of classes");
+		fprintf(stderr, "\n Could not read number of classes \n");
 		exit(-1);
 	}
 
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 	/*writing the number of features*/
 	if (fscanf(fpIn, "%d", &nfeats) != 1)
 	{
-		fprintf(stderr, "Could not read number of features");
+		fprintf(stderr, "\n Could not read number of features \n");
 		exit(-1);
 	}
 
@@ -57,14 +57,14 @@ int main(int argc, char **argv)
 	{
 		if (fscanf(fpIn, "%d", &id) != 1)
 		{
-			fprintf(stderr, "Could not read sample id");
+			fprintf(stderr, "\n Could not read sample id at line %d \n", i);
 			exit(-1);
 		}
 		fwrite(&id, sizeof(int), 1, fpOut);
 
 		if (fscanf(fpIn, "%d", &label) != 1)
 		{
-			fprintf(stderr, "Could not read sample label");
+			fprintf(stderr, "\n Could not read sample label at line %d \n", i);
 			exit(-1);
 		}
 		fwrite(&label, sizeof(int), 1, fpOut);
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 		{
 			if (fscanf(fpIn, "%f", &aux) != 1)
 			{
-				fprintf(stderr, "Could not read sample features");
+				fprintf(stderr, "\n Could not read sample features at line %d, feature %d  \n", i, j);
 				exit(-1);
 			}
 
