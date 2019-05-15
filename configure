@@ -6,7 +6,7 @@
 
 if [ $OPF_DIR ] 
 then 
-	echo "# The Enviroment variable OPF_DIRR=${OPF_DIR} is already seted, nothing to do here."
+	 echo "# The Enviroment variable OPF_DIR=${OPF_DIR} is already set, nothing to do here."
 else
     OPF_DIR=$(pwd)
     echo "Adding Enviroment variable to ${OPF_DIR}."    
