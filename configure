@@ -1,0 +1,21 @@
+#!/bin/bash
+
+########## Enviroment Variable Configuration ##########
+# adding the environment variable of the LibOPF library to the .bashrc
+# checking if the Enviroment variable is already configured
+
+if [ $OPF_DIR ] 
+then 
+	 echo "# The Enviroment variable OPF_DIR=${OPF_DIR} is already set, nothing to do here."
+else
+    OPF_DIR=$(pwd)
+    echo "Adding Enviroment variable to ${OPF_DIR}."    
+    echo "" >> ~/.bashrc
+    echo "# added by LibOPT" >> ~/.bashrc
+    echo "export OPF_DIR=${OPF_DIR}" >> ~/.bashrc
+    
+    echo "Please run the following on your current shell:"
+    echo "source ~/.bashrc"
+    echo "Or close this shell session and open a new one."
+fi 
+####################################################
