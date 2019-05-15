@@ -1108,7 +1108,7 @@ void opf_WriteOutputFile(Subgraph *g, char *file)
   FILE *fp = NULL;
   int i;
 
-  fp = fopen(file, "wb");
+  fp = fopen(file, "w");
 
   for (i = 0; i < g->nnodes; i++)
 	  fprintf(fp, "%d\n", g->node[i].label);
