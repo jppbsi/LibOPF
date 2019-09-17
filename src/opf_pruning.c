@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 
 	if ((argc != 5) && (argc != 4))
 	{
-		fprintf(stderr, "\nusage opf_classify <P1> <P2>");
+		fprintf(stderr, "\nusage opf_pruning <P1> <P2> <P3> <P4>");
 		fprintf(stderr, "\nP1: training set in the OPF file format");
 		fprintf(stderr, "\nP2: evaluating set in the OPF file format");
 		fprintf(stderr, "\nP3: percentage of accuracy [0,1]");
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	fflush(stdout);
 
 	if (opf_PrecomputedDistance)
-		opf_DistanceValue = opf_ReadDistances(argv[2], &n);
+		opf_DistanceValue = opf_ReadDistances(argv[4], &n);
 
 	isize = gTrain->nnodes;
 	fprintf(stdout, "\nPruning training set ...");
